@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.util.packet;
 
-import com.fusionflux.gravity_api.api.RotationParameters;
+import fun.teamti.gravity.api.RotationParameters;
 import com.fusionflux.gravity_api.util.Gravity;
 import com.fusionflux.gravity_api.util.GravityComponent;
 import com.fusionflux.gravity_api.util.NetworkUtil;

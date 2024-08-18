@@ -1,7 +1,7 @@
 package com.fusionflux.gravity_api.util;
 
-import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.api.RotationParameters;
+import fun.teamti.gravity.api.GravityChangerAPI;
+import fun.teamti.gravity.api.RotationParameters;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;

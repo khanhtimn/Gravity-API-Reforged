@@ -1,7 +1,7 @@
 package com.fusionflux.gravity_api.item;
 
-import com.fusionflux.gravity_api.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.api.RotationParameters;
+import fun.teamti.gravity.api.GravityChangerAPI;
+import fun.teamti.gravity.api.RotationParameters;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

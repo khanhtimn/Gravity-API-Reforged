@@ -1,6 +1,6 @@
 package com.fusionflux.gravity_api.util;
 
-import com.fusionflux.gravity_api.api.RotationParameters;
+import fun.teamti.gravity.api.RotationParameters;
 import net.minecraft.util.math.Direction;
 
 public class Gravity {
