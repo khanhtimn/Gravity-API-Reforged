@@ -1,0 +1,56 @@
+{
+  "item.gravity_api.gravity_changer_down": "Down Gravity Changer",
+  "item.gravity_api.gravity_changer_up": "Up Gravity Changer",
+  "item.gravity_api.gravity_changer_north": "North Gravity Changer",
+  "item.gravity_api.gravity_changer_south": "South Gravity Changer",
+  "item.gravity_api.gravity_changer_west": "West Gravity Changer",
+  "item.gravity_api.gravity_changer_east": "East Gravity Changer",
+
+  "item.gravity_api.gravity_changer_down_aoe": "Down Gravity Changer AOE",
+  "item.gravity_api.gravity_changer_up_aoe": "Up Gravity Changer AOE",
+  "item.gravity_api.gravity_changer_north_aoe": "North Gravity Changer AOE",
+  "item.gravity_api.gravity_changer_south_aoe": "South Gravity Changer AOE",
+  "item.gravity_api.gravity_changer_west_aoe": "West Gravity Changer AOE",
+  "item.gravity_api.gravity_changer_east_aoe": "East Gravity Changer AOE",
+
+  "itemGroup.gravity_api.general": "Gravity API",
+
+  "direction.down": "Down",
+  "direction.up": "Up",
+  "direction.north": "North",
+  "direction.south": "South",
+  "direction.west": "West",
+  "direction.east": "East",
+
+  "commands.gravity.get.self": "Your gravity is %s",
+  "commands.gravity.get.other": "%s's gravity is %s",
+  "commands.gravity.set.self": "Set own gravity to %s",
+  "commands.gravity.set.other": "Set %s's gravity to %s",
+
+  "text.autoconfig.gravity_api.title": "Gravity API Config",
+
+  "gravity_api.midnightconfig.client.@PrefixText": "Client",
+  "gravity_api.midnightconfig.keepWorldLook": "Keep World Look",
+  "gravity_api.midnightconfig.keepWorldLook.@Tooltip[0]": "Makes it so that you keep your world relative",
+  "gravity_api.midnightconfig.keepWorldLook.@Tooltip[1]": "look direction when changing gravity",
+
+  "gravity_api.midnightconfig.rotationTime": "Camera Rotation Time",
+  "gravity_api.midnightconfig.rotationTime.@Tooltip[0]": "The time it takes for the camera to rotate",
+  "gravity_api.midnightconfig.rotationTime.@Tooltip[1]": "from one direction to the next",
+
+  "gravity_api.midnightconfig.server.@PrefixText": "Server",
+  "gravity_api.midnightconfig.worldVelocity": "World Relative Velocity Transfer",
+  "gravity_api.midnightconfig.worldVelocity.@Tooltip[0]": "Makes it so when gravity changes velocity is world relative",
+  "gravity_api.midnightconfig.worldVelocity.@Tooltip[1]": "lets you keep moving the same direction when gravity changes",
+
+  "gravity_api.midnightconfig.resetGravityOnDimensionChange": "Reset Gravity On Dimension Change",
+  "gravity_api.midnightconfig.resetGravityOnDimensionChange.@Tooltip[0]": "Makes it so that your gravity is reset",
+  "gravity_api.midnightconfig.resetGravityOnDimensionChange.@Tooltip[1]": "to Your Gravity Default every time you change dimension",
+
+  "gravity_api.midnightconfig.resetGravityOnRespawn": "Reset Gravity On Respawn",
+  "gravity_api.midnightconfig.resetGravityOnRespawn.@Tooltip[0]": "Makes it so that your gravity is reset",
+  "gravity_api.midnightconfig.resetGravityOnRespawn.@Tooltip[1]": "to Your Gravity Default every time you respawn",
+  "gravity_api.midnightconfig.voidDamageAboveWorld": "Void Damage Above World",
+  "gravity_api.midnightconfig.voidDamageAboveWorld.@Tooltip[0]": "Makes it so that you start taking void damage",
+  "gravity_api.midnightconfig.voidDamageAboveWorld.@Tooltip[1]": "if you are above y = max_world_height + 256"
+}
