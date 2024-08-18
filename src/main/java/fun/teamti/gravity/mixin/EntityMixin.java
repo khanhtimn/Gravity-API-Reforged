@@ -7,6 +7,7 @@ import com.fusionflux.gravity_api.util.CompatMath;
 import com.fusionflux.gravity_api.util.RotationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -519,10 +521,10 @@ public abstract class EntityMixin {
     }
 
     @ModifyArg(
-            method = "getHorizontalFacing",
+            method = "getDirection",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Direction;fromRotation(D)Lnet/minecraft/util/math/Direction;"
+                    target = "Lnet/minecraft/core/Direction;fromYRot(D)Lnet/minecraft/core/Direction;"
             )
     )
     private double redirect_getHorizontalFacing_getYaw_0(double rotation) {
@@ -535,7 +537,7 @@ public abstract class EntityMixin {
     }
 
     @Inject(
-            method = "spawnSprintingParticles",
+            method = "spawnSprintParticle",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -549,19 +551,19 @@ public abstract class EntityMixin {
 
         BlockPos blockPos = CompatMath.fastBlockPos(floorPos);
         BlockState blockState = this.level.getBlockState(blockPos);
-        if (blockState.getRenderType() != BlockRenderType.INVISIBLE) {
+        if (blockState.getRenderShape() != RenderShape.INVISIBLE) {
             Vec3 particlePos = this.position().add(RotationUtil.vecPlayerToWorld((this.random.nextDouble() - 0.5D) * (double) this.dimensions.width, 0.1D, (this.random.nextDouble() - 0.5D) * (double) this.dimensions.width, gravityDirection));
             Vec3 playerVelocity = this.getDeltaMovement();
             Vec3 particleVelocity = RotationUtil.vecPlayerToWorld(playerVelocity.x * -4.0D, 1.5D, playerVelocity.z * -4.0D, gravityDirection);
-            this.level.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, blockState), particlePos.x, particlePos.y, particlePos.z, particleVelocity.x, particleVelocity.y, particleVelocity.z);
+            this.level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockState), particlePos.x, particlePos.y, particlePos.z, particleVelocity.x, particleVelocity.y, particleVelocity.z);
         }
     }
 
     @ModifyVariable(
-            method = "updateMovementInFluid",
+            method = "lambda$updateFluidHeightAndDoFluidPushing$29",
             at = @At(
                     value = "INVOKE_ASSIGN",
-                    target = "Lnet/minecraft/entity/Entity;getVelocity()Lnet/minecraft/util/math/Vec3;",
+                    target = "Lnet/minecraft/world/entity/Entity;getDeltaMovement()Lnet/minecraft/world/phys/Vec3;",
                     ordinal = 0
             ),
             ordinal = 1
@@ -576,11 +578,11 @@ public abstract class EntityMixin {
     }
 
     @ModifyArg(
-            method = "updateMovementInFluid",
+            method = "lambda$updateFluidHeightAndDoFluidPushing$29",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Vec3;add(Lnet/minecraft/util/math/Vec3;)Lnet/minecraft/util/math/Vec3;",
-                    ordinal = 1
+                    target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V",
+                    ordinal = 0
             ),
             index = 0
     )
@@ -595,7 +597,7 @@ public abstract class EntityMixin {
 
 
     @Inject(
-            method = "pushAwayFrom",
+            method = "push(Lnet/minecraft/world/entity/Entity;)V",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -663,21 +665,21 @@ public abstract class EntityMixin {
     }
 
     @Inject(
-            method = "tryTickInVoid",
+            method = "checkBelowWorld",
             at = @At("HEAD")
     )
     private void inject_attemptTickInVoid(CallbackInfo ci) {
-        if (GravityChangerMod.config.voidDamageAboveWorld && this.getY() > (double) (this.level.getTopY() + 256)) {
+        if (GravityChangerMod.config.voidDamageAboveWorld && this.getY() > (double) (this.level.getMaxBuildHeight() + 256)) {
             this.onBelowWorld();
         }
     }
 
     @ModifyArgs(
-            method = "doesNotCollide(DDD)Z",
+            method = "isFree(DDD)Z",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/util/math/Box;move(DDD)Lnet/minecraft/util/math/Box;",
-                    ordinal = 0
+                    target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;",
+                    ordinal= 0
             )
     )
     private void redirect_doesNotCollide_offset_0(Args args) {
@@ -690,19 +692,19 @@ public abstract class EntityMixin {
 
 
     @ModifyVariable(
-            method = "updateSubmergedInWaterState",
+            method = "updateFluidOnEyes",
             at = @At(
                     value = "STORE"
             ),
             ordinal = 0
     )
     private double submergedInWaterEyeFix(double d) {
-        d = this.getEyePosition().getY();
+        d = this.getEyePosition().y();
         return d;
     }
 
     @ModifyVariable(
-            method = "updateSubmergedInWaterState",
+            method = "updateFluidOnEyes",
             at = @At(
                     value = "STORE"
             ),
