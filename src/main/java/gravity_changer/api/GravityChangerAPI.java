@@ -5,20 +5,20 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import gravity_changer.DimensionGravityDataComponent;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerComponents;
-import gravity_changer.GravityComponent;
+import gravity_changer.GravityComponentFabric;
 import gravity_changer.RotationAnimation;
 import gravity_changer.util.RotationUtil;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityChangerAPI {
-    public static final ComponentKey<GravityComponent> GRAVITY_COMPONENT =
+    public static final ComponentKey<GravityComponentFabric> GRAVITY_COMPONENT =
         GravityChangerComponents.GRAVITY_COMP_KEY;
     
     public static final ComponentKey<DimensionGravityDataComponent> DIMENSION_DATA_COMPONENT =
@@ -29,7 +29,7 @@ public abstract class GravityChangerAPI {
      * Returns the applied gravity direction for the given entity
      */
     public static Direction getGravityDirection(Entity entity) {
-        GravityComponent comp = getGravityComponentEarly(entity);
+        GravityComponentFabric comp = getGravityComponentEarly(entity);
         
         if (comp == null) {
             return Direction.DOWN;
@@ -47,7 +47,7 @@ public abstract class GravityChangerAPI {
     }
     
     public static void setBaseGravityStrength(Entity entity, double strength) {
-        GravityComponent component = getGravityComponent(entity);
+        GravityComponentFabric component = getGravityComponent(entity);
         
         component.setBaseGravityStrength(strength);
     }
@@ -77,12 +77,12 @@ public abstract class GravityChangerAPI {
     public static void setBaseGravityDirection(
         Entity entity, Direction gravityDirection
     ) {
-        GravityComponent component = getGravityComponent(entity);
+        GravityComponentFabric component = getGravityComponent(entity);
         component.setBaseGravityDirection(gravityDirection);
     }
     
     @Nullable
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static RotationAnimation getRotationAnimation(Entity entity) {
         return getGravityComponent(entity).getRotationAnimation();
     }
@@ -95,7 +95,7 @@ public abstract class GravityChangerAPI {
     public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
         Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
         
-        GravityComponent component = getGravityComponent(entity);
+        GravityComponentFabric component = getGravityComponent(entity);
         
         component.setBaseGravityDirection(direction);
         
@@ -104,7 +104,7 @@ public abstract class GravityChangerAPI {
         component.forceApplyGravityChange();
     }
     
-    public static GravityComponent getGravityComponent(Entity entity) {
+    public static GravityComponentFabric getGravityComponent(Entity entity) {
         return GRAVITY_COMPONENT.get(entity);
     }
     
@@ -113,8 +113,7 @@ public abstract class GravityChangerAPI {
      * but bounding box calculation can happen inside constructor
      * see {@link dev.onyxstudios.cca.mixin.entity.common.MixinEntity}
      */
-    @SuppressWarnings({"ConstantValue", "UnstableApiUsage", "DataFlowIssue"})
-    public static @Nullable GravityComponent getGravityComponentEarly(Entity entity) {
+    public static @Nullable GravityComponentFabric getGravityComponentEarly(Entity entity) {
         if (((ComponentProvider) entity).getComponentContainer() == null) {
             return null;
         }

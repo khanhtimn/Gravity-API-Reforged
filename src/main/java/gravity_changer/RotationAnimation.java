@@ -100,8 +100,7 @@ public class RotationAnimation {
         
         Vector3f lookingDirection = new Vector3f((float) oldLookingDirection.x, (float) oldLookingDirection.y, (float) oldLookingDirection.z);
         lookingDirection.rotate(deltaRotation);
-        Vec3 newLookingDirection = new Vec3(lookingDirection);
-        return newLookingDirection;
+        return new Vec3(lookingDirection);
     }
     
     /**
@@ -133,7 +132,6 @@ public class RotationAnimation {
     /**
      * When doing gravity flipping, the rotation center is the player bounding box center.
      * But the player feet pos changes abruptly. So we need special calculation to eye offset.
-     *
      * Note when rotateView is false, it will cause non-smooth eye offset change
      */
     public Vec3 getEyeOffset(

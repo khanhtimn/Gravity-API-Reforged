@@ -1,6 +1,6 @@
 package gravity_changer.mob_effect;
 
-import gravity_changer.GravityComponent;
+import gravity_changer.GravityComponentFabric;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +33,7 @@ public class GravityStrengthMobEffect extends MobEffect {
         return Math.pow(base, (double) level) * signum;
     }
     
-    private void apply(LivingEntity entity, GravityComponent component) {
+    private void apply(LivingEntity entity, GravityComponentFabric component) {
         MobEffectInstance effectInstance = entity.getEffect(this);
         
         if (effectInstance == null) {
@@ -46,7 +46,7 @@ public class GravityStrengthMobEffect extends MobEffect {
     }
     
     public static void init() {
-        GravityComponent.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
+        GravityComponentFabric.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
             if (entity instanceof LivingEntity livingEntity) {
                 INCREASE.apply(livingEntity, component);
                 DECREASE.apply(livingEntity, component);

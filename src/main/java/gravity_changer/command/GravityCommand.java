@@ -3,7 +3,7 @@ package gravity_changer.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import gravity_changer.GravityComponent;
+import gravity_changer.GravityComponentFabric;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;
@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class GravityCommand {
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands
             .literal("gravity")
@@ -88,7 +89,7 @@ public class GravityCommand {
             .executes(context -> {
                 Entity entity = context.getSource().getEntity();
                 
-                GravityComponent component = GravityChangerAPI.getGravityComponent(entity);
+                GravityComponentFabric component = GravityChangerAPI.getGravityComponent(entity);
                 
                 context.getSource().sendSuccess(
                     () -> Component.translatable(

@@ -5,6 +5,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public abstract class QuaternionUtil {
+
     public static Quaternionf getViewRotation(float pitch, float yaw) {
         Quaternionf r1 = new Quaternionf().fromAxisAngleDeg(new Vector3f(1, 0, 0), pitch);
         Quaternionf r2 = new Quaternionf().fromAxisAngleDeg(new Vector3f(0, 1, 0), yaw + 180);

@@ -15,8 +15,8 @@ public class GravityChangerComponents implements EntityComponentInitializer, Wor
     public static final ResourceLocation DATA_COMPONENT_ID =
         new ResourceLocation("gravity_changer", "gravity_data");
     
-    public static final ComponentKey<GravityComponent> GRAVITY_COMP_KEY =
-        ComponentRegistry.getOrCreate(DATA_COMPONENT_ID, GravityComponent.class);
+    public static final ComponentKey<GravityComponentFabric> GRAVITY_COMP_KEY =
+        ComponentRegistry.getOrCreate(DATA_COMPONENT_ID, GravityComponentFabric.class);
     
     public static final ResourceLocation DIMENSION_DATA_ID =
         new ResourceLocation("gravity_changer", "dimension_data");
@@ -27,17 +27,17 @@ public class GravityChangerComponents implements EntityComponentInitializer, Wor
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerForPlayers(
-            GRAVITY_COMP_KEY, GravityComponent::new,
-            new RespawnCopyStrategy<GravityComponent>() {
+            GRAVITY_COMP_KEY, GravityComponentFabric::new,
+            new RespawnCopyStrategy<GravityComponentFabric>() {
                 @Override
-                public void copyForRespawn(GravityComponent from, GravityComponent to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+                public void copyForRespawn(GravityComponentFabric from, GravityComponentFabric to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
                     if (lossless || !GravityChangerMod.config.resetGravityOnRespawn) {
                         RespawnCopyStrategy.copy(from, to);
                     }
                 }
             }
         );
-        registry.registerFor(Entity.class, GRAVITY_COMP_KEY, GravityComponent::new);
+        registry.registerFor(Entity.class, GRAVITY_COMP_KEY, GravityComponentFabric::new);
     }
     
     @Override

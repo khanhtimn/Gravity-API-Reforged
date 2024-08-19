@@ -7,19 +7,19 @@ public enum LocalDirection {
     BACKWARD(2, "backward"),
     LEFT(3, "left"),
     RIGHT(1, "right");
-    
+
     private final int horizontalOffset;
     private final String name;
-    
+
     LocalDirection(int horizontalOffset, String name) {
         this.horizontalOffset = horizontalOffset;
         this.name = name;
     }
-    
+
     public int getHorizontalOffset() {
         return this.horizontalOffset;
     }
-    
+
     public String getName() {
         return this.name;
     }

@@ -9,6 +9,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
 
 public class GCUtil {
+
     public static MutableComponent getLinkText(String link) {
         return Component.literal(link).withStyle(
             style -> style.withClickEvent(new ClickEvent(

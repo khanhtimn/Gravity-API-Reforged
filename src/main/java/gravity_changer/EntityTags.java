@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class EntityTags {
     /**
@@ -21,7 +22,7 @@ public class EntityTags {
      * It's not favorable to let every mod add blacklist entity tag for this.
      */
     public static final TagKey<EntityType<?>> ALLOWED_SPECIAL = TagKey.create(
-        BuiltInRegistries.ENTITY_TYPE.key(),
+        ForgeRegistries.ENTITY_TYPES.getRegistryKey(),
         new ResourceLocation("gravity_changer", "allowed_special")
     );
     
@@ -33,7 +34,7 @@ public class EntityTags {
             return true;
         }
         
-        return entity.getType().builtInRegistryHolder().is(ALLOWED_SPECIAL);
+        return entity.getType().is(ALLOWED_SPECIAL);
     }
     
     public static boolean allowGravityTransformationInRendering(Entity entity) {

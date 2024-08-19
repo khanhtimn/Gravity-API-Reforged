@@ -14,6 +14,7 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 
 public abstract class RotationUtil {
+
     private static final Direction[][] DIR_WORLD_TO_PLAYER = new Direction[6][];
     
     static {

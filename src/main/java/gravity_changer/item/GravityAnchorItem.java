@@ -1,6 +1,6 @@
 package gravity_changer.item;
 
-import gravity_changer.GravityComponent;
+import gravity_changer.GravityComponentFabric;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -34,7 +34,7 @@ public class GravityAnchorItem extends Item {
             );
         }
         
-        GravityComponent.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
+        GravityComponentFabric.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
             for (ItemStack handSlot : entity.getHandSlots()) {
                 Item item = handSlot.getItem();
                 if (item instanceof GravityAnchorItem anchorItem) {
