@@ -1,15 +1,17 @@
 package fun.teamti.gravity.mixin.client;
 
-import java.util.Optional;
-
-import com.fusionflux.gravity_api.RotationAnimation;
-import fun.teamti.gravity.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.CompatMath;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
+import gravity_changer.RotationAnimation;
+import gravity_changer.api.GravityChangerAPI;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,62 +19,67 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
-
 @Mixin(value = Camera.class, priority = 1001)
+
 public abstract class CameraMixin {
-    @Shadow protected abstract void setPos(double x, double y, double z);
+    @Shadow
+    protected abstract void setPosition(double x, double y, double z);
 
-    @Shadow private Entity focusedEntity;
+    @Shadow
+    private Entity entity;
 
-    @Shadow @Final private Quaternionf rotation;
-    
-    @Shadow private float lastCameraY;
-    
-    @Shadow private float cameraY;
+    @Shadow
+    @Final
+    private Quaternionf rotation;
 
-    private float storedTickDelta = 0.f;
+    @Shadow
+    private float eyeHeightOld;
 
-    @Inject(method="update", at=@At("HEAD"))
-    private void inject_update(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci){
-        storedTickDelta = tickDelta;
-    }
+    @Shadow
+    private float eyeHeight;
 
     @WrapOperation(
-            method = "update",
+            method = "setup",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V",
+                    target = "Lnet/minecraft/client/Camera;setPosition(DDD)V",
                     ordinal = 0
             )
     )
-    private void wrapOperation_update_setPos_0(Camera camera, double x, double y, double z, Operation<Void> original, BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);;
-        Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
-        if(animationOptional.isEmpty()){
+    private void wrapOperation_update_setPos_0(
+            Camera camera, double x, double y, double z,
+            Operation<Void> original, BlockGetter area, Entity focusedEntity,
+            boolean thirdPerson, boolean inverseView, float tickDelta
+    ) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
+        RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
+
+        if (animation == null) {
             original.call(this, x, y, z);
             return;
         }
-        RotationAnimation animation = animationOptional.get();
+
+        float partialTick = Minecraft.getInstance().getFrameTime();
+        long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (partialTick * 50);
+        animation.update(timeMs);
         if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
             original.call(this, x, y, z);
             return;
         }
-        long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
-        Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
 
-        double entityX = MathHelper.lerp((double) tickDelta, focusedEntity.prevX, focusedEntity.getX());
-        double entityY = MathHelper.lerp((double) tickDelta, focusedEntity.prevY, focusedEntity.getY());
-        double entityZ = MathHelper.lerp((double) tickDelta, focusedEntity.prevZ, focusedEntity.getZ());
+        Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
 
-        double currentCameraY = MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY);
+        double entityX = Mth.lerp((double) tickDelta, focusedEntity.xo, focusedEntity.getX());
+        double entityY = Mth.lerp((double) tickDelta, focusedEntity.yo, focusedEntity.getY());
+        double entityZ = Mth.lerp((double) tickDelta, focusedEntity.zo, focusedEntity.getZ());
 
-        Vector3f eyeOffset = new Vector3f(0, (float) currentCameraY, 0);
-        eyeOffset.rotate(gravityRotation);
+        double currentCameraY = Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight);
+
+        Vec3 eyeOffset = animation.getEyeOffset(
+                gravityRotation,
+                new Vec3(0, currentCameraY, 0),
+                gravityDirection
+        );
 
         original.call(
                 this,
@@ -83,24 +90,30 @@ public abstract class CameraMixin {
     }
 
     @Inject(
-            method = "setRotation",
+            method = "setRotation(FF)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;",
-                    shift = At.Shift.AFTER
+                    shift = At.Shift.AFTER,
+                    remap = false
             )
     )
     private void inject_setRotation(CallbackInfo ci) {
-        if(this.focusedEntity !=null) {
-            Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.focusedEntity);
-            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
-            if(animationOptional.isEmpty()) return;
-            RotationAnimation animation = animationOptional.get();
-            if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
-            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
-            Quaternionf rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
-            Quaternionf product = CompatMath.hamiltonProduct(rotation,this.rotation);
-            this.rotation.set(product.x(), product.y(), product.z(), product.w());
+        if (this.entity != null) {
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
+            RotationAnimation animation = GravityChangerAPI.getRotationAnimation(entity);
+            if (animation == null) {
+                return;
+            }
+            if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
+                return;
+            }
+            float partialTick = Minecraft.getInstance().getFrameTime();
+            long timeMs = entity.level().getGameTime() * 50 + (long) (partialTick * 50);
+            Quaternionf rotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
+            rotation.conjugate();
+            rotation.mul(this.rotation);
+            this.rotation.set(rotation.x(), rotation.y(), rotation.z(), rotation.w());
         }
     }
 }

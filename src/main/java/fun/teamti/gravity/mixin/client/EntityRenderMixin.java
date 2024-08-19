@@ -1,17 +1,12 @@
 package fun.teamti.gravity.mixin.client;
 
 
-import fun.teamti.gravity.api.GravityChangerAPI;
-import com.fusionflux.gravity_api.util.CompatMath;
-import com.fusionflux.gravity_api.util.RotationUtil;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
+import gravity_changer.api.GravityChangerAPI;
+import gravity_changer.util.RotationUtil;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,13 +21,13 @@ public abstract class EntityRenderMixin {
     //                ordinal = 0
     //        )
     //)
-    //private Quaternion redirect_renderLabelIfPresent_getRotation_0(EntityRenderDispatcher entityRenderDispatcher, Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    //private Quaternionf redirect_renderLabelIfPresent_getRotation_0(EntityRenderDispatcher entityRenderDispatcher, Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
     //    Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
     //    if(gravityDirection == Direction.DOWN) {
     //        return entityRenderDispatcher.getRotation();
     //    }
 ////
-    //    Quaternion quaternion = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
+    //    Quaternionf Quaternionf = RotationUtil.getCameraRotationQuaternion(gravityDirection).copy();
     //    quaternion.conjugate();
     //    quaternion.hamiltonProduct(entityRenderDispatcher.getRotation().copy());
     //    return quaternion;
@@ -40,19 +35,21 @@ public abstract class EntityRenderMixin {
 
 
     @ModifyExpressionValue(
-            method = "renderLabelIfPresent",
+            method = "renderNameTag",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRotation()Lorg/joml/Quaternionf;",
+                    target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;cameraOrientation()Lorg/joml/Quaternionf;",
                     ordinal = 0
             )
     )
     private Quaternionf modifyExpressionValue_renderLabelIfPresent_getRotation_0(Quaternionf originalRotation, Entity entity) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if(gravityDirection == Direction.DOWN) {
+        if (gravityDirection == Direction.DOWN) {
             return originalRotation;
         }
-        Quaternionf quaternion = RotationUtil.getCameraRotationQuaternion(gravityDirection).conjugate();
-        return CompatMath.hamiltonProduct(quaternion,originalRotation);
+        Quaternionf quaternion = new Quaternionf(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+        quaternion.conjugate();
+        quaternion.mul(originalRotation);
+        return quaternion;
     }
 }
