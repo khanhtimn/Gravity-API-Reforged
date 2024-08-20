@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = GravityMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientTickEvent {
 
-    private static final String ISSUE_LINK = "https://github.com/qouteall/GravityChanger/issues";
+    private static final String ISSUE_LINK = "https://github.com/khanhtimn/Gravity-API-Reforged/issues";
     private static boolean displayPreviewWarning = true;
 
     @SubscribeEvent

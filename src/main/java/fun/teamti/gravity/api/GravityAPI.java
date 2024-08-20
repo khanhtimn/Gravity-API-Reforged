@@ -19,11 +19,11 @@ import org.jetbrains.annotations.Nullable;
 public abstract class GravityAPI {
 
     public static GravityData getGravityData(Entity entity) {
-        return entity.getCapability(ModCapability.GRAVITY_DATA).orElseThrow(() -> new IllegalStateException("Entity does not have gravity data"));
+        return entity.getCapability(ModCapability.GRAVITY_DATA).orElse(new GravityData(entity));
     }
 
     public static DimensionGravityData getDimensionGravityData(Level level) {
-        return level.getCapability(ModCapability.DIMENSION_GRAVITY_DATA).orElseThrow(() -> new IllegalStateException("Dimension does not have dimension gravity data"));
+        return level.getCapability(ModCapability.DIMENSION_GRAVITY_DATA).orElse(new DimensionGravityData(level));
     }
 
     /**
