@@ -3,7 +3,7 @@ package gravity_changer.plating;
 import com.mojang.logging.LogUtils;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerMod;
-import gravity_changer.GravityComponentFabric;
+import gravity_changer.GravityData;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;
@@ -269,7 +269,7 @@ public class GravityPlatingBlockEntity extends BlockEntity {
         for (Entity entity : entities) {
             boolean applies = false;
             
-            GravityComponentFabric comp = GravityChangerAPI.getGravityComponent(entity);
+            GravityData comp = GravityChangerAPI.getGravityComponent(entity);
             Direction entityGravityDir = comp.getCurrGravityDirection();
             
             for (Direction plateDir : Direction.values()) {
@@ -328,7 +328,7 @@ public class GravityPlatingBlockEntity extends BlockEntity {
     // when approaching an inward corner, do auto-jump to make it smoothly go forward
     private static void tryToDoCornerAutoJump(
         BlockState blockState, BlockPos blockPos,
-        Entity entity, GravityComponentFabric comp
+        Entity entity, GravityData comp
     ) {
         if (!entity.onGround()) {
             return;

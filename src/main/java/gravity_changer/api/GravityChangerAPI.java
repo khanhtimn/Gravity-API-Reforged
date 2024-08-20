@@ -1,11 +1,8 @@
 package gravity_changer.api;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import gravity_changer.DimensionGravityDataComponent;
+
 import gravity_changer.EntityTags;
-import gravity_changer.GravityChangerComponents;
-import gravity_changer.GravityComponentFabric;
+import gravity_changer.GravityData;
 import gravity_changer.RotationAnimation;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -18,18 +15,12 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityChangerAPI {
-    public static final ComponentKey<GravityComponentFabric> GRAVITY_COMPONENT =
-        GravityChangerComponents.GRAVITY_COMP_KEY;
-    
-    public static final ComponentKey<DimensionGravityDataComponent> DIMENSION_DATA_COMPONENT =
-        GravityChangerComponents.DIMENSION_COMP_KEY;
-    
     
     /**
      * Returns the applied gravity direction for the given entity
      */
     public static Direction getGravityDirection(Entity entity) {
-        GravityComponentFabric comp = getGravityComponentEarly(entity);
+        GravityData comp = getGravityComponentEarly(entity);
         
         if (comp == null) {
             return Direction.DOWN;
@@ -47,17 +38,17 @@ public abstract class GravityChangerAPI {
     }
     
     public static void setBaseGravityStrength(Entity entity, double strength) {
-        GravityComponentFabric component = getGravityComponent(entity);
+        GravityData component = getGravityComponent(entity);
         
         component.setBaseGravityStrength(strength);
     }
     
-    public static double getDimensionGravityStrength(Level world) {
-        return DIMENSION_DATA_COMPONENT.get(world).getDimensionGravityStrength();
+    public static double getDimensionGravityStrength(Level level) {
+        return DIMENSION_DATA_COMPONENT.get(level).getDimensionGravityStrength();
     }
     
-    public static void setDimensionGravityStrength(Level world, double strength) {
-        DIMENSION_DATA_COMPONENT.get(world).setDimensionGravityStrength(strength);
+    public static void setDimensionGravityStrength(Level level, double strength) {
+        DIMENSION_DATA_COMPONENT.get(level).setDimensionGravityStrength(strength);
     }
     
     public static void resetGravity(Entity entity) {
@@ -77,7 +68,7 @@ public abstract class GravityChangerAPI {
     public static void setBaseGravityDirection(
         Entity entity, Direction gravityDirection
     ) {
-        GravityComponentFabric component = getGravityComponent(entity);
+        GravityData component = getGravityComponent(entity);
         component.setBaseGravityDirection(gravityDirection);
     }
     
@@ -95,7 +86,7 @@ public abstract class GravityChangerAPI {
     public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
         Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
         
-        GravityComponentFabric component = getGravityComponent(entity);
+        GravityData component = getGravityComponent(entity);
         
         component.setBaseGravityDirection(direction);
         
@@ -104,7 +95,7 @@ public abstract class GravityChangerAPI {
         component.forceApplyGravityChange();
     }
     
-    public static GravityComponentFabric getGravityComponent(Entity entity) {
+    public static GravityData getGravityComponent(Entity entity) {
         return GRAVITY_COMPONENT.get(entity);
     }
     
@@ -113,7 +104,7 @@ public abstract class GravityChangerAPI {
      * but bounding box calculation can happen inside constructor
      * see {@link dev.onyxstudios.cca.mixin.entity.common.MixinEntity}
      */
-    public static @Nullable GravityComponentFabric getGravityComponentEarly(Entity entity) {
+    public static @Nullable GravityData getGravityComponentEarly(Entity entity) {
         if (((ComponentProvider) entity).getComponentContainer() == null) {
             return null;
         }

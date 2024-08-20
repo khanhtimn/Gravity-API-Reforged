@@ -1,6 +1,6 @@
 package gravity_changer.mob_effect;
 
-import gravity_changer.GravityComponentFabric;
+import gravity_changer.GravityData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -52,7 +52,7 @@ public class GravityDirectionMobEffect extends MobEffect {
             );
         }
 
-        GravityComponentFabric.GRAVITY_UPDATE_EVENT.register(
+        GravityData.GRAVITY_UPDATE_EVENT.register(
                 PHASE, (entity, component) -> {
                     if (!(entity instanceof LivingEntity livingEntity)) {
                         return;
