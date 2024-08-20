@@ -1,6 +1,6 @@
 package gravity_changer.item;
 
-import gravity_changer.GravityData;
+import fun.teamti.gravity_api.capability.data.GravityData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;

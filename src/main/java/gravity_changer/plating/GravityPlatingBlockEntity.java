@@ -1,13 +1,12 @@
 package gravity_changer.plating;
 
 import com.mojang.logging.LogUtils;
+import fun.teamti.gravity_api.capability.data.GravityData;
 import gravity_changer.EntityTags;
 import gravity_changer.GravityChangerMod;
-import gravity_changer.GravityData;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;

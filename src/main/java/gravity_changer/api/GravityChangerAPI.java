@@ -1,8 +1,9 @@
 package gravity_changer.api;
 
 
+import fun.teamti.gravity_api.capability.ModCapability;
+import fun.teamti.gravity_api.capability.data.GravityData;
 import gravity_changer.EntityTags;
-import gravity_changer.GravityData;
 import gravity_changer.RotationAnimation;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -44,7 +45,7 @@ public abstract class GravityChangerAPI {
     }
     
     public static double getDimensionGravityStrength(Level level) {
-        return DIMENSION_DATA_COMPONENT.get(level).getDimensionGravityStrength();
+        return ModCapability.DIMENSION_GRAVITY_DATA.get(level).getDimensionGravityStrength();
     }
     
     public static void setDimensionGravityStrength(Level level, double strength) {

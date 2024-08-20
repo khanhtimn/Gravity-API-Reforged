@@ -3,7 +3,7 @@ package gravity_changer.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import gravity_changer.GravityData;
+import fun.teamti.gravity_api.capability.data.GravityData;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.GCUtil;
 import gravity_changer.util.RotationUtil;

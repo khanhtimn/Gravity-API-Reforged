@@ -1,6 +1,6 @@
 package fun.teamti.gravity_api.capability.data;
 
-import com.mojang.logging.LogUtils;
+import fun.teamti.gravity_api.GravityAPI;
 import fun.teamti.gravity_api.mixin.EntityAccessor;
 import gravity_changer.*;
 import gravity_changer.api.GravityChangerAPI;
@@ -20,11 +20,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
 
 /**
  * The gravity is determined by the follows:
@@ -37,51 +37,14 @@ import org.slf4j.Logger;
  * (The client player's gravity attributes are separately computed.
  * Other client entities' are synced from server.)
  */
-public class GravityData implements IGravityData {
+public class GravityData implements INBTSerializable<CompoundTag> {
+            
+    // Only used on client, not synchronized.
+    @Nullable
+    private final RotationAnimation animation;
 
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
-        this.writeToNbt(tag);
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        this.readFromNbt(nbt);
-    }
-
-    public static interface GravityUpdateCallback {
-        void update(Entity entity, GravityData component);
-    }
-
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    /**
-     * Fired every tick for every entity, both on client and server.
-     * <p>
-     * In the event, it can call
-     * {@link GravityData#applyGravityDirectionEffect(Direction, RotationParameters, double)}
-     * and
-     * {@link GravityData#applyGravityStrengthEffect(double)}
-     * (these two applying methods can also be called outside the event)
-     * <p>
-     * To keep the result consistent between client and server,
-     * the event listener should only use synchronized information.
-     * <p>
-     * In the event, it can read the current gravity direction for use cases like gravity inverting. (It requires phase ordering to keep the execution order.)
-     */
-//    public static final Event<GravityComponent.GravityUpdateCallback> GRAVITY_UPDATE_EVENT =
-//            EventFactory.createArrayBacked(
-//                    GravityComponent.GravityUpdateCallback.class,
-//                    listeners -> (entity, component) -> {
-//                        for (GravityComponent.GravityUpdateCallback callback : listeners) {
-//                            callback.update(entity, component);
-//                        }
-//                    }
-//            );
-
+    private final Entity entity;  
+            
     private boolean initialized = false;
 
     // not synchronized
@@ -92,16 +55,10 @@ public class GravityData implements IGravityData {
     Direction baseGravityDirection = Direction.DOWN;
 
     // the base gravity strength
-    double baseGravityStrength = 1.0;
+    private double baseGravityStrength = 1.0;
 
     @Nullable
     RotationParameters currentRotationParameters = RotationParameters.getDefault();
-
-    // Only used on client, not synchronized.
-    @Nullable
-    public final RotationAnimation animation;
-
-    public final Entity entity;
 
     private Direction currGravityDirection = Direction.DOWN;
     private double currGravityStrength = 1.0;
@@ -128,7 +85,18 @@ public class GravityData implements IGravityData {
         }
     }
 
-    protected void readFromNbt(CompoundTag tag) {
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("baseGravityDirection", baseGravityDirection.getName());
+        tag.putString("currentGravityDirection", currGravityDirection.getName());
+        tag.putDouble("baseGravityStrength", baseGravityStrength);
+        tag.putDouble("currentGravityStrength", currGravityStrength);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
         if (tag.contains("baseGravityDirection")) {
             baseGravityDirection = Direction.byName(tag.getString("baseGravityDirection"));
         } else {
@@ -167,16 +135,8 @@ public class GravityData implements IGravityData {
         }
     }
 
-    private boolean shouldAcceptServerSync() {
+    public boolean shouldAcceptServerSync() {
         return entity.level().isClientSide() && !GCUtil.isClientPlayer(entity);
-    }
-
-    protected void writeToNbt(@NotNull CompoundTag tag) {
-        tag.putString("baseGravityDirection", baseGravityDirection.getName());
-        tag.putString("currentGravityDirection", currGravityDirection.getName());
-
-        tag.putDouble("baseGravityStrength", baseGravityStrength);
-        tag.putDouble("currentGravityStrength", currGravityStrength);
     }
 
     public void tick() {
@@ -195,6 +155,34 @@ public class GravityData implements IGravityData {
             }
         }
     }
+
+    public static interface GravityUpdateCallback {
+        void update(Entity entity, GravityData component);
+    }
+
+    /**
+     * Fired every tick for every entity, both on client and server.
+     * <p>
+     * In the event, it can call
+     * {@link GravityData#applyGravityDirectionEffect(Direction, RotationParameters, double)}
+     * and
+     * {@link GravityData#applyGravityStrengthEffect(double)}
+     * (these two applying methods can also be called outside the event)
+     * <p>
+     * To keep the result consistent between client and server,
+     * the event listener should only use synchronized information.
+     * <p>
+     * In the event, it can read the current gravity direction for use cases like gravity inverting. (It requires phase ordering to keep the execution order.)
+     */
+//    public static final Event<GravityComponent.GravityUpdateCallback> GRAVITY_UPDATE_EVENT =
+//            EventFactory.createArrayBacked(
+//                    GravityComponent.GravityUpdateCallback.class,
+//                    listeners -> (entity, component) -> {
+//                        for (GravityComponent.GravityUpdateCallback callback : listeners) {
+//                            callback.update(entity, component);
+//                        }
+//                    }
+//            );
 
     public void updateGravityStatus(boolean sendPacketIfNecessary) {
         // for the remote players and non-player entities,
@@ -287,9 +275,7 @@ public class GravityData implements IGravityData {
         }
     }
 
-    public void applyGravityStrengthEffect(
-            double strengthMultiplier
-    ) {
+    public void applyGravityStrengthEffect(double strengthMultiplier) {
         if (isFiringUpdateEvent) {
             currGravityStrength *= strengthMultiplier;
         } else {
@@ -380,6 +366,8 @@ public class GravityData implements IGravityData {
     // getVelocity() does not return the actual velocity. It returns the velocity plus acceleration.
     // Even if the entity is standing still, getVelocity() will still give a downwards vector.
     // The real velocity is this tick position subtract last tick position
+
+
     private static Vec3 getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
         if (entity.isControlledByLocalInstance()) {
             return new Vec3(
@@ -411,7 +399,6 @@ public class GravityData implements IGravityData {
         }
     }
 
-    // Adjust position to avoid suffocation in blocks when changing gravity
     private void adjustEntityPosition(Direction oldGravity, Direction newGravity, AABB entityBoundingBox) {
         if (!GravityChangerMod.config.adjustPositionAfterChangingGravity) {
             return;
@@ -435,7 +422,8 @@ public class GravityData implements IGravityData {
                 AABB boundingBox = collision.bounds();
                 if (totalCollisionBox == null) {
                     totalCollisionBox = boundingBox;
-                } else {
+                }
+                else {
                     totalCollisionBox = totalCollisionBox.minmax(boundingBox);
                 }
             }
@@ -446,7 +434,7 @@ public class GravityData implements IGravityData {
                     entityBoundingBox, totalCollisionBox, movingDirection
             );
             if (entity instanceof Player) {
-                LOGGER.info("Adjusting player position {} {}", positionAdjustmentOffset, entity);
+                GravityAPI.LOGGER.info("Adjusting player position {} {}", positionAdjustmentOffset, entity);
             }
             entity.setPos(entity.position().add(positionAdjustmentOffset));
         }
@@ -474,6 +462,10 @@ public class GravityData implements IGravityData {
         return new Vec3(movingDirection.step()).scale(offset);
     }
 
+    private boolean canChangeGravity() {
+        return EntityTags.canChangeGravity(entity);
+    }
+
     public double getBaseGravityStrength() {
         return baseGravityStrength;
     }
@@ -482,7 +474,6 @@ public class GravityData implements IGravityData {
         if (!canChangeGravity()) {
             return;
         }
-
         baseGravityStrength = strength;
         needsSync = true;
     }
@@ -493,10 +484,6 @@ public class GravityData implements IGravityData {
 
     public double getCurrGravityStrength() {
         return currGravityStrength;
-    }
-
-    private boolean canChangeGravity() {
-        return EntityTags.canChangeGravity(entity);
     }
 
     public Direction getPrevGravityDirection() {
@@ -521,12 +508,7 @@ public class GravityData implements IGravityData {
             updateGravityStatus(false); // will this cause issue?
         }
     }
-
-    public void reset() {
-        baseGravityDirection = Direction.DOWN;
-        baseGravityStrength = 1.0;
-        needsSync = true;
-    }
+    
 
     @OnlyIn(Dist.CLIENT)
     public RotationAnimation getRotationAnimation() {
@@ -559,6 +541,12 @@ public class GravityData implements IGravityData {
     public void forceApplyGravityChange() {
         prevGravityDirection = currGravityDirection;
         prevGravityStrength = currGravityStrength;
+    }
+
+    public void reset() {
+        baseGravityDirection = Direction.DOWN;
+        baseGravityStrength = 1.0;
+        needsSync = true;
     }
 
     private static record GravityDirEffect(

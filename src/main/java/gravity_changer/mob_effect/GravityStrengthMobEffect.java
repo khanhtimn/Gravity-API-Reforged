@@ -1,6 +1,6 @@
 package gravity_changer.mob_effect;
 
-import gravity_changer.GravityData;
+import fun.teamti.gravity_api.capability.data.GravityData;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
