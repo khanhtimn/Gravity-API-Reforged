@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.api.GravityAPI;
+import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.util.GCUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.commands.CommandSourceStack;
@@ -88,14 +89,14 @@ public class GravityCommand {
         builder.then(Commands.literal("view")
             .executes(context -> {
                 Entity entity = context.getSource().getEntity();
-                
-                GravityData component = GravityAPI.getGravityData(entity);
-                
+
+                assert entity != null;
+
                 context.getSource().sendSuccess(
                     () -> Component.translatable(
                         "gravity_changer.command.inform",
-                        component.getBaseGravityDirection().getName(),
-                        component.getBaseGravityStrength()
+                        entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityDirection).orElse(Direction.DOWN).getName(),
+                        entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityStrength).orElse(1.0)
                     ), false
                 );
                 

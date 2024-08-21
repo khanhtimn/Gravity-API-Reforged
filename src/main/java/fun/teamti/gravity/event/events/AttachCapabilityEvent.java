@@ -16,19 +16,21 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() != null) {
-            if (!event.getObject().getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
-                event.addCapability(
-                        new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
-                        new GravityDataProvider(event.getObject())
-                );
-            }
+        assert event.getObject() != null;
+        if (!event.getObject().getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
+            GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", event.getObject().getClass().getSimpleName());
+            event.addCapability(
+                    new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
+                    new GravityDataProvider(event.getObject())
+            );
         }
+
     }
 
     @SubscribeEvent
     public static void onAttachCapabilitiesLevelChunk(AttachCapabilitiesEvent<Level> event) {
         if (event.getObject() instanceof Level && !event.getObject().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).isPresent()) {
+            GravityMod.LOGGER.info("Attaching dimension gravity data capability to level: {}", event.getObject().dimension());
             event.addCapability(
                     new ResourceLocation(GravityMod.MOD_ID, "dimension_data"),
                     new DimensionGravityDataProvider(event.getObject())

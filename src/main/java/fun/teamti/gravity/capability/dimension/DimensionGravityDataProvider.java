@@ -32,6 +32,10 @@ public class DimensionGravityDataProvider implements ICapabilityProvider, INBTSe
         this.dimensionGravityDataOptional = LazyOptional.of(() -> dimensionGravityData);
     }
 
+    public DimensionGravityData getDimensionGravityData() {
+        return dimensionGravityData;
+    }
+
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         return ModCapability.DIMENSION_GRAVITY_DATA.orEmpty(cap, dimensionGravityDataOptional);
