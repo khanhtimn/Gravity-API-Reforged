@@ -27,7 +27,7 @@ public class GravityAPIConfig {
                 .comment("""
                         If enabled,
                         Default: false""")
-                .define("switch_first_person_scoping", false);
+                .define("worldVelocity", false);
         GRAVITY_STRENGTH_MULTIPLIER = BUILDER
                 .comment("""
                         Default: 1.0""")

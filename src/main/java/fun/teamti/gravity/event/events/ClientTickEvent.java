@@ -10,18 +10,15 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = GravityMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientTickEvent {
 
-    private static final String ISSUE_LINK = "https://github.com/khanhtimn/Gravity-API-Reforged/issues";
-    private static boolean displayPreviewWarning = true;
-
     @SubscribeEvent
-    public static void onStartTick(TickEvent.PlayerTickEvent event) {
+    public static void onPLayerStartTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             assert event.player != null;
-            if (displayPreviewWarning) {
-                displayPreviewWarning = false;
+            if (GravityMod.displayPreviewWarning) {
+                GravityMod.displayPreviewWarning = false;
                 event.player.sendSystemMessage(
                         Component.translatable("gravity_changer.preview").append(
-                                GCUtil.getLinkText(ISSUE_LINK)
+                                GCUtil.getLinkText(GravityMod.ISSUE_LINK)
                         )
                 );
             }

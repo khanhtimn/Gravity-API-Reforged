@@ -88,8 +88,8 @@ public abstract class FishingHookEntityRendererMixin extends EntityRenderer<Fish
         }
 
         float handSwingProgress = playerEntity.getAttackAnim(tickDelta);
-        float sinHandSwingProgress = Mth.sin(Mth.sqrt(handSwingProgress) * 3.1415927F);
-        float radBodyYaw = Mth.lerp(tickDelta, playerEntity.yBodyRotO, playerEntity.yBodyRot) * 0.017453292F;
+        float sinHandSwingProgress = Mth.sin(Mth.sqrt(handSwingProgress) * (float) Math.PI);
+        float radBodyYaw = Mth.lerp(tickDelta, playerEntity.yBodyRotO, playerEntity.yBodyRot) * (float) Math.PI / 180F;
         double sinBodyYaw = Mth.sin(radBodyYaw);
         double cosBodyYaw = Mth.cos(radBodyYaw);
         double scaledArmOffset = (double) armOffset * 0.35D;

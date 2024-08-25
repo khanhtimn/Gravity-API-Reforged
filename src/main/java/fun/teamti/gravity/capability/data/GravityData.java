@@ -158,34 +158,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public static interface GravityUpdateCallback {
-        void update(Entity entity, GravityData component);
-    }
-
-    /**
-     * Fired every tick for every entity, both on client and server.
-     * <p>
-     * In the event, it can call
-     * {@link GravityData#applyGravityDirectionEffect(Direction, RotationParameters, double)}
-     * and
-     * {@link GravityData#applyGravityStrengthEffect(double)}
-     * (these two applying methods can also be called outside the event)
-     * <p>
-     * To keep the result consistent between client and server,
-     * the event listener should only use synchronized information.
-     * <p>
-     * In the event, it can read the current gravity direction for use cases like gravity inverting. (It requires phase ordering to keep the execution order.)
-     */
-//    public static final Event<GravityComponent.GravityUpdateCallback> GRAVITY_UPDATE_EVENT =
-//            EventFactory.createArrayBacked(
-//                    GravityComponent.GravityUpdateCallback.class,
-//                    listeners -> (entity, component) -> {
-//                        for (GravityComponent.GravityUpdateCallback callback : listeners) {
-//                            callback.update(entity, component);
-//                        }
-//                    }
-//            );
-
     public void updateGravityStatus(boolean sendPacketIfNecessary) {
         // for the remote players and non-player entities,
         // their effect data is not synchronized to the client
@@ -340,6 +312,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
 
         adjustEntityPosition(oldGravity, newGravity, entity.getBoundingBox());
 
+        //TODO: isClientSide check fail?
         if (entity.level().isClientSide()) {
             Validate.notNull(animation, "gravity animation is null");
 
@@ -368,8 +341,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     // getVelocity() does not return the actual velocity. It returns the velocity plus acceleration.
     // Even if the entity is standing still, getVelocity() will still give a downwards vector.
     // The real velocity is this tick position subtract last tick position
-
-
     private static Vec3 getRealWorldVelocity(Entity entity, Direction prevGravityDirection) {
         if (entity.isControlledByLocalInstance()) {
             return new Vec3(

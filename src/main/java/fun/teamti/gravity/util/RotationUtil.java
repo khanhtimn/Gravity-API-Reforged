@@ -167,8 +167,8 @@ public abstract class RotationUtil {
     }
     
     public static Vec3 rotToVec(float yaw, float pitch) {
-        double radPitch = pitch * 0.017453292;
-        double radNegYaw = -yaw * 0.017453292;
+        double radPitch = pitch * (float) Math.PI / 180F;
+        double radNegYaw = -yaw * (float) Math.PI / 180F;
         double cosNegYaw = Math.cos(radNegYaw);
         double sinNegYaw = Math.sin(radNegYaw);
         double cosPitch = Math.cos(radPitch);
@@ -185,7 +185,7 @@ public abstract class RotationUtil {
         double radNegYaw = Math.acos(cosNegYaw);
         if (sinNegYaw < 0) radNegYaw = Math.PI * 2 - radNegYaw;
         
-        return new Vec2(Mth.wrapDegrees((float) (-radNegYaw) / 0.017453292F), (float) (radPitch) / 0.017453292F);
+        return new Vec2(Mth.wrapDegrees((float) (-radNegYaw) / (float) Math.PI / 180F), (float) (radPitch) / (float) Math.PI / 180F);
     }
     
     public static Vec2 vecToRot(Vec3 vec3d) {
@@ -251,17 +251,7 @@ public abstract class RotationUtil {
         return new Quaternionf().set(startGravityRotation).slerp(endGravityRotation, progress);
     }
 
-    //TODO
-    public static AABB makeBox(
-            Entity entity, Direction gravityDir
-    ) {
-        AABB rawBox = entity.getDimensions(entity.getPose()).makeBoundingBox(entity.getEyePosition());
-        return boxPlayerToWorld(rawBox, gravityDir).move(entity.getEyePosition());
-    }
-    
-    public static AABB makeBoxFromDimensions(
-        EntityDimensions dimensions, Direction gravityDir, Vec3 pos
-    ) {
+    public static AABB makeBoxFromDimensions(EntityDimensions dimensions, Direction gravityDir, Vec3 pos) {
         AABB rawBox = dimensions.makeBoundingBox(0, 0, 0);
         return boxPlayerToWorld(rawBox, gravityDir).move(pos);
     }

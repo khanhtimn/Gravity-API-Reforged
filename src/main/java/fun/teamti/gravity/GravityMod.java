@@ -29,6 +29,8 @@ public class GravityMod
 {
     public static final String MOD_ID = "gravity_api";
     public static final Logger LOGGER = LoggerFactory.getLogger("GravityAPI");
+    public static final String ISSUE_LINK = "https://github.com/khanhtimn/Gravity-API-Reforged/issues";
+    public static boolean displayPreviewWarning = true;
 
     public GravityMod()
     {

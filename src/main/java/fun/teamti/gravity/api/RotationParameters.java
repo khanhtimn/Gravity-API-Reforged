@@ -12,14 +12,6 @@ public record RotationParameters (
             true, true, 500
     );
 
-    public static void updateDefault() {
-        defaultParam = new RotationParameters(
-                !GravityAPIConfig.WORLD_VELOCITY.get(),
-                true,
-                GravityAPIConfig.ROTATION_TIME.get()
-        );
-    }
-
     public static RotationParameters getDefault() {
         return defaultParam;
     }

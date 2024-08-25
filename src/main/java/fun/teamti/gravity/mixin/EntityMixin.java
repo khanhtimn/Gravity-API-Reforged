@@ -1,5 +1,7 @@
 package fun.teamti.gravity.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.config.GravityAPIConfig;
 import fun.teamti.gravity.util.RotationUtil;
@@ -11,6 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
@@ -671,23 +674,22 @@ public abstract class EntityMixin {
         return blockpos;
     }
 
-    //TODO: CanEnterPose
-//    @WrapOperation(
-//            method = "canEnterPose",
-//            at = @At(
-//                    value = "INVOKE",
-//                    target = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;"
-//            )
-//    )
-//    private AABB wrapOperation_canEnterPoseAndEntitiesWhen_getBoundingBox(
-//            Entity entity, Pose pPose, Operation<AABB> original
-//    ) {
-//        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
-//        if (gravityDirection == Direction.DOWN) {
-//            return original.call(entity, pPose);
-//        }
-//
-//        AABB result = RotationUtil.makeBox(entity, gravityDirection);
-//        return result;
-//    }
+    @WrapOperation(
+            method = "canEnterPose",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;"
+            )
+    )
+    private AABB wrapOperation_canEnterPoseAndEntitiesWhen_getBoundingBox(
+            Entity entity, Pose pPose, Operation<AABB> original
+    ) {
+        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
+        if (gravityDirection == Direction.DOWN) {
+            return original.call(entity, pPose);
+        }
+
+        return RotationUtil.makeBoxFromDimensions(entity.getDimensions(pPose), gravityDirection, entity.getEyePosition());
+    }
+
 }

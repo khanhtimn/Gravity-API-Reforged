@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Camera.class, priority = 1001)
-
 public abstract class CameraMixin {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);

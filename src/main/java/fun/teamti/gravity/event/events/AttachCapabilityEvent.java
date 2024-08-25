@@ -6,6 +6,8 @@ import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
 import fun.teamti.gravity.init.ModCapability;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,14 +19,15 @@ public class AttachCapabilityEvent {
     @SubscribeEvent
     public static void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
         assert event.getObject() != null;
-        if (!event.getObject().getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
-            GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", event.getObject().getClass().getSimpleName());
-            event.addCapability(
-                    new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
-                    new GravityDataProvider(event.getObject())
-            );
+        if(event.getObject() instanceof LivingEntity || event.getObject() instanceof Player) {
+            if (!event.getObject().getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
+                GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", event.getObject().getClass().getSimpleName());
+                event.addCapability(
+                        new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
+                        new GravityDataProvider(event.getObject())
+                );
+            }
         }
-
     }
 
     @SubscribeEvent
