@@ -4,9 +4,11 @@ import fun.teamti.gravity.EntityTags;
 import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.RotationAnimation;
 import fun.teamti.gravity.config.GravityAPIConfig;
+import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.mixin.EntityAccessor;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.api.RotationParameters;
+import fun.teamti.gravity.network.GravityDataSyncPacket;
 import fun.teamti.gravity.util.GCUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -153,7 +155,9 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         if (!entity.level().isClientSide()) {
             if (needsSync) {
                 needsSync = false;
+                //TODO: Sync
                 //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+                GravityDataSyncPacket.sendToClient(entity, this, ModNetwork.INSTANCE);
             }
         }
     }
@@ -212,13 +216,14 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             boolean changed = oldGravityDirection != currGravityDirection ||
                     Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
             if (changed) {
-                //TODO: Send packet
+                //TODO: Send packet to other players
                 //sendSyncPacketToOtherPlayers();
             }
         }
     }
 
 //    private void sendSyncPacketToOtherPlayers() {
+//        ModNetwork.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(p -> p != entity), new GravityDataSyncPacket(entity.getId(), this));
 //        GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);
 //    }
 
@@ -258,7 +263,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
 //    public void applySyncPacket(FriendlyByteBuf buf) {
-//        AutoSyncedComponent.super.applySyncPacket(buf);
+//        new GravityDataSyncPacket(buf);
 //
 //        if (entity.level().isClientSide()) {
 //            // the packet should be handled on client thread

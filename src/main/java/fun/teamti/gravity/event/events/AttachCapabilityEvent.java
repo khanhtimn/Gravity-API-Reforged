@@ -18,14 +18,16 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
-        assert event.getObject() != null;
-        if(event.getObject() instanceof LivingEntity || event.getObject() instanceof Player) {
-            if (!event.getObject().getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
-                GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", event.getObject().getClass().getSimpleName());
+        Entity entity = event.getObject();
+        if(entity instanceof LivingEntity || entity instanceof Player) {
+            if (!entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
+                GravityDataProvider provider = new GravityDataProvider(entity);
+                GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", entity.getClass().getSimpleName());
                 event.addCapability(
                         new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
-                        new GravityDataProvider(event.getObject())
+                        provider
                 );
+                //event.addListener(provider::invalidate);
             }
         }
     }

@@ -1,25 +1,15 @@
 package fun.teamti.gravity;
 
 import fun.teamti.gravity.command.DirectionArgumentType;
-import fun.teamti.gravity.command.GravityCommand;
 import fun.teamti.gravity.command.LocalDirectionArgumentType;
 import fun.teamti.gravity.config.GravityAPIConfig;
-import fun.teamti.gravity.item.GravityAnchorItem;
-import fun.teamti.gravity.item.GravityChangerItem;
-import fun.teamti.gravity.item.GravityChangerItemAOE;
-import fun.teamti.gravity.mob.effect.GravityDirectionMobEffect;
-import fun.teamti.gravity.mob.effect.GravityInvertMobEffect;
-import fun.teamti.gravity.mob.effect.GravityPotion;
-import fun.teamti.gravity.mob.effect.GravityStrengthMobEffect;
-import fun.teamti.gravity.plating.GravityPlatingBlock;
-import fun.teamti.gravity.plating.GravityPlatingBlockEntity;
-import fun.teamti.gravity.plating.GravityPlatingItem;
+import fun.teamti.gravity.init.ModNetwork;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +26,7 @@ public class GravityMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GravityAPIConfig.SPEC, "gravity_api.toml");
+        modEventBus.addListener(this::commonSetup);
         //GravityChangerItem.init();
         //GravityChangerItemAOE.init();
         //GravityAnchorItem.init();
@@ -53,6 +44,11 @@ public class GravityMod
         LocalDirectionArgumentType.init();
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private void commonSetup(final FMLCommonSetupEvent event)
+    {
+        ModNetwork.init();
     }
 
 }

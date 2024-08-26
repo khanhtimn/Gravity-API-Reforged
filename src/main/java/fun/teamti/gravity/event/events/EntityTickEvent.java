@@ -13,6 +13,6 @@ public class EntityTickEvent {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLivingEntityTickEvent(LivingEvent.LivingTickEvent event) {
-            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent((GravityData::tick));
+        event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
     }
 }

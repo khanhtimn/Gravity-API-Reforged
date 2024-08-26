@@ -22,6 +22,10 @@ public class GravityDataProvider implements ICapabilityProvider, INBTSerializabl
         this.gravityDataOptional = LazyOptional.of(() -> gravityData);
     }
 
+    public void invalidate() {
+        gravityDataOptional.invalidate();
+    }
+
     @Override
     public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
         return ModCapability.GRAVITY_DATA.orEmpty(cap, gravityDataOptional);
