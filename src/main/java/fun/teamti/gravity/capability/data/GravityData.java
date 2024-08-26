@@ -157,7 +157,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
                 needsSync = false;
                 //TODO: Sync
                 //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
-                GravityDataSyncPacket.sendToClient(entity, this, ModNetwork.INSTANCE);
+                GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
             }
         }
     }
@@ -527,7 +527,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         needsSync = true;
     }
 
-    private static record GravityDirEffect(
+    private record GravityDirEffect(
             @NotNull Direction direction,
             @Nullable RotationParameters rotationParameters,
             double priority

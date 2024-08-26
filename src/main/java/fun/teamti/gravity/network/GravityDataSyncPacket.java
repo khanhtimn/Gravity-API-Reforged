@@ -1,10 +1,9 @@
 package fun.teamti.gravity.network;
 
 
-
-import fun.teamti.gravity.capability.data.GravityData;
+import fun.teamti.gravity.init.ModCapability;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
@@ -15,41 +14,41 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import java.util.function.Supplier;
 
 public class GravityDataSyncPacket {
+
     private final int entityId;
-    private final Direction gravityDirection;
-    private final double gravityStrength;
+    private final CompoundTag nbtData;
 
-    public GravityDataSyncPacket(Entity entity, GravityData gravityData) {
+    public GravityDataSyncPacket(Entity entity, CompoundTag nbtData) {
         this.entityId = entity.getId();
-        this.gravityDirection = gravityData.getCurrGravityDirection();
-        this.gravityStrength = gravityData.getCurrGravityStrength();
+        this.nbtData = nbtData;
     }
 
-    public GravityDataSyncPacket(FriendlyByteBuf buf) {
-        this.entityId = buf.readInt();
-        this.gravityDirection = Direction.byName(buf.readUtf(16));
-        this.gravityStrength = buf.readDouble();
+    public GravityDataSyncPacket(FriendlyByteBuf buffer) {
+        this.entityId = buffer.readInt();
+        this.nbtData = buffer.readNbt();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(entityId);
-        buf.writeUtf(gravityDirection.getName());
-        buf.writeDouble(gravityStrength);
+    public void toBytes(FriendlyByteBuf buffer) {
+        buffer.writeInt(this.entityId);
+        buffer.writeNbt(this.nbtData);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
-        context.get().enqueueWork(() -> {
+    // Sending the packet to clients tracking the entity
+    public static void sendToClient(Entity entity, CompoundTag tag, SimpleChannel channel) {
+        channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new GravityDataSyncPacket(entity, tag));
+    }
+
+    // Handling the packet on the client side
+    public static void handle(GravityDataSyncPacket packet, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
             assert Minecraft.getInstance().level != null;
-            Entity entity = Minecraft.getInstance().level.getEntity(entityId);
+            Entity entity = Minecraft.getInstance().level.getEntity(packet.entityId);
             if (entity != null) {
+                entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                    gravityData.deserializeNBT(packet.nbtData);
+                });
             }
         });
-        context.get().setPacketHandled(true);
-    }
-
-    public static void sendToClient(Entity entity, GravityData gravityData, SimpleChannel channel) {
-        if (!entity.level().isClientSide) {
-            channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), new GravityDataSyncPacket(entity, gravityData));
-        }
+        ctx.get().setPacketHandled(true);
     }
 }
