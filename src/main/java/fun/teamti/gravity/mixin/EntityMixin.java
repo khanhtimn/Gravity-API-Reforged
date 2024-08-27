@@ -121,6 +121,9 @@ public abstract class EntityMixin {
     @Shadow
     public float fallDistance;
 
+    @Shadow
+    public abstract void tick();
+
     @Inject(
             method = "makeBoundingBox()Lnet/minecraft/world/phys/AABB;",
             at = @At("RETURN"),
@@ -691,5 +694,4 @@ public abstract class EntityMixin {
 
         return RotationUtil.makeBoxFromDimensions(entity.getDimensions(pPose), gravityDirection, entity.getEyePosition());
     }
-
 }

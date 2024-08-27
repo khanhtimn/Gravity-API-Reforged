@@ -21,11 +21,11 @@ public class AttachCapabilityEvent {
         Entity entity = event.getObject();
         if(entity instanceof LivingEntity || entity instanceof Player) {
             if (!entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
-                GravityDataProvider provider = new GravityDataProvider(entity);
-                GravityMod.LOGGER.info("Attaching gravity data capability to entity: {}", entity.getClass().getSimpleName());
+                String isClientSide = entity.level().isClientSide() ? "from clientside" : "";
+                GravityMod.LOGGER.info("Attaching gravity data capability to entity: {} {}", entity.getClass().getSimpleName(), isClientSide);
                 event.addCapability(
                         new ResourceLocation(GravityMod.MOD_ID, "gravity_data"),
-                        provider
+                        new GravityDataProvider(entity)
                 );
                 //event.addListener(provider::invalidate);
             }

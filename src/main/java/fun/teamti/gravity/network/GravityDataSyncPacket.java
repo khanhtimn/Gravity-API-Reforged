@@ -33,22 +33,18 @@ public class GravityDataSyncPacket {
         buffer.writeNbt(this.nbtData);
     }
 
-    // Sending the packet to clients tracking the entity
-    public static void sendToClient(Entity entity, CompoundTag tag, SimpleChannel channel) {
-        channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new GravityDataSyncPacket(entity, tag));
-    }
-
-    // Handling the packet on the client side
     public static void handle(GravityDataSyncPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             assert Minecraft.getInstance().level != null;
             Entity entity = Minecraft.getInstance().level.getEntity(packet.entityId);
-            if (entity != null) {
-                entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                    gravityData.deserializeNBT(packet.nbtData);
-                });
+            if (entity != null && entity.level().hasChunk(entity.chunkPosition().x, entity.chunkPosition().z)) {
+                entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> gravityData.deserializeNBT(packet.nbtData));
             }
         });
         ctx.get().setPacketHandled(true);
+    }
+
+    public static void sendToClient(Entity entity, CompoundTag tag, SimpleChannel channel) {
+        channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new GravityDataSyncPacket(entity, tag));
     }
 }
