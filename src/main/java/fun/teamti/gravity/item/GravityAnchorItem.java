@@ -1,11 +1,8 @@
 package fun.teamti.gravity.item;
 
 import fun.teamti.gravity.GravityMod;
-import fun.teamti.gravity.capability.data.GravityData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -55,21 +52,21 @@ public class GravityAnchorItem extends Item {
         return new ResourceLocation(GravityMod.MOD_ID, "gravity_anchor_" + direction.getName());
     }
     
-    public GravityAnchorItem(Direction _direction, Properties settings) {
-        super(settings);
-        direction = _direction;
+    public GravityAnchorItem(Direction pDirection, Properties pProperties) {
+        super(pProperties);
+        direction = pDirection;
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(@NotNull ItemStack itemStack, Level world, List<Component> tooltip, @NotNull TooltipFlag tooltipContext) {
         tooltip.add(
-            Component.translatable("gravity_changer.gravity_anchor.tooltip.0")
+            Component.translatable("gravity_api.gravity_anchor.tooltip.0")
                 .withStyle(ChatFormatting.GRAY)
         );
         
         tooltip.add(
-            Component.translatable("gravity_changer.gravity_anchor.tooltip.1")
+            Component.translatable("gravity_api.gravity_anchor.tooltip.1")
                 .withStyle(ChatFormatting.GRAY)
         );
     }

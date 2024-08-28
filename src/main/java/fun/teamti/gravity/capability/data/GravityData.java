@@ -9,7 +9,7 @@ import fun.teamti.gravity.mixin.EntityAccessor;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.api.RotationParameters;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
-import fun.teamti.gravity.util.GCUtil;
+import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -42,17 +42,22 @@ import org.joml.Vector3f;
  * Other client entities' are synced from server.)
  */
 public class GravityData implements INBTSerializable<CompoundTag> {
-            
+
     // Only used on client, not synchronized.
     @Nullable
     private final RotationAnimation animation;
 
-    private final Entity entity;  
-            
+    private final Entity entity;
+
     private boolean initialized = false;
 
     // not synchronized
     private Direction prevGravityDirection = Direction.DOWN;
+
+    public double getPrevGravityStrength() {
+        return prevGravityStrength;
+    }
+
     private double prevGravityStrength = 1.0;
 
     // the base gravity direction
@@ -61,10 +66,19 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     // the base gravity strength
     private double baseGravityStrength = 1.0;
 
+    public @Nullable RotationParameters getCurrentRotationParameters() {
+        return currentRotationParameters;
+    }
+
     @Nullable
     RotationParameters currentRotationParameters = RotationParameters.getDefault();
 
     private Direction currGravityDirection = Direction.DOWN;
+
+    public double getCurrentGravityStrength() {
+        return currGravityStrength;
+    }
+
     private double currGravityStrength = 1.0;
     private double currentEffectPriority = Double.MIN_VALUE;
 
@@ -140,7 +154,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
     public boolean shouldAcceptServerSync() {
-        return entity.level().isClientSide() && !GCUtil.isClientPlayer(entity);
+        return entity.level().isClientSide() && !ClientUtil.isClientPlayer(entity);
     }
 
     public void tick() {
@@ -157,6 +171,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
                 needsSync = false;
                 //TODO: Sync
                 //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
+                //GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
                 GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
             }
         }
@@ -217,15 +232,10 @@ public class GravityData implements INBTSerializable<CompoundTag> {
                     Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
             if (changed) {
                 //TODO: Send packet to other players
-                //sendSyncPacketToOtherPlayers();
+                //GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
             }
         }
     }
-
-//    private void sendSyncPacketToOtherPlayers() {
-//        ModNetwork.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(p -> p != entity), new GravityDataSyncPacket(entity.getId(), this));
-//        GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);
-//    }
 
     public void applyGravityDirectionEffect(
             @NotNull Direction direction,
@@ -261,16 +271,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             delayApplyStrengthEffect *= strengthMultiplier;
         }
     }
-
-//    public void applySyncPacket(FriendlyByteBuf buf) {
-//        new GravityDataSyncPacket(buf);
-//
-//        if (entity.level().isClientSide()) {
-//            // the packet should be handled on client thread
-//            // start the gravity animation (doing that during ticking is too late)
-//            applyGravityChange();
-//        }
-//    }
 
     public void applyGravityDirectionChange(
             Direction oldGravity, Direction newGravity,
@@ -400,8 +400,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
                 AABB boundingBox = collision.bounds();
                 if (totalCollisionBox == null) {
                     totalCollisionBox = boundingBox;
-                }
-                else {
+                } else {
                     totalCollisionBox = totalCollisionBox.minmax(boundingBox);
                 }
             }
@@ -486,7 +485,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             updateGravityStatus(false); // will this cause issue?
         }
     }
-    
+
 
     @OnlyIn(Dist.CLIENT)
     public RotationAnimation getRotationAnimation() {
@@ -509,6 +508,14 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         if (Math.abs(currGravityStrength - prevGravityStrength) > 0.0001) {
             prevGravityStrength = currGravityStrength;
         }
+    }
+
+    public void updateFromPacket(
+            Direction currGravityDirection,
+            double currGravityStrength
+    ) {
+        this.currGravityDirection = currGravityDirection;
+        this.currGravityStrength = currGravityStrength;
     }
 
     /**

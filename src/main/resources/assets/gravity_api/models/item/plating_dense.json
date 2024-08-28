@@ -1,4 +1,4 @@
 {
-    "parent": "gravity_changer:block/plating_dense"
+    "parent": "gravity_api:block/plating_dense"
 }
 

@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.init.ModCapability;
-import fun.teamti.gravity.util.GCUtil;
+import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -29,7 +29,7 @@ public class GravityCommand {
             .requires(source -> source.hasPermission(2));
         
         builder.then(Commands.literal("set_base_direction")
-            .then(Commands.argument("direction", DirectionArgumentType.instance)
+            .then(Commands.argument("direction", DirectionArgumentType.INSTANCE)
                 .executes(context -> {
                     Entity entity = context.getSource().getEntity();
                     Validate.isTrue(entity != null);
@@ -94,7 +94,7 @@ public class GravityCommand {
 
                 context.getSource().sendSuccess(
                     () -> Component.translatable(
-                        "gravity_changer.command.inform",
+                        "gravity_api.command.inform",
                         entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityDirection).orElse(Direction.DOWN).getName(),
                         entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityStrength).orElse(1.0)
                     ), false
@@ -121,7 +121,7 @@ public class GravityCommand {
         );
         
         builder.then(Commands.literal("set_relative_base_direction")
-            .then(Commands.argument("relativeDirection", LocalDirectionArgumentType.instance)
+            .then(Commands.argument("relativeDirection", LocalDirectionArgumentType.INSTANCE)
                 .executes(context -> {
                     LocalDirection relativeDirection =
                         LocalDirectionArgumentType.getDirection(context, "relativeDirection");
@@ -167,7 +167,7 @@ public class GravityCommand {
                 ServerLevel world = context.getSource().getLevel();
                 double strength = GravityAPI.getDimensionGravityStrength(world);
                 context.getSource().sendSuccess(
-                    () -> Component.translatable("gravity_changer.command.dimension_info", strength), false
+                    () -> Component.translatable("gravity_api.command.dimension_info", strength), false
                 );
                 return 0;
             })
@@ -193,7 +193,7 @@ public class GravityCommand {
     }
     
     private static void getSendFeedback(CommandSourceStack source, Entity entity, Direction gravityDirection) {
-        Component text = GCUtil.getDirectionText(gravityDirection);
+        Component text = ClientUtil.getDirectionText(gravityDirection);
         if (source.getEntity() != null && source.getEntity() == entity) {
             source.sendSuccess(() -> Component.translatable("commands.gravity.get.self", text), true);
         }

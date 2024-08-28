@@ -1,10 +1,13 @@
 package fun.teamti.gravity;
 
-import fun.teamti.gravity.command.DirectionArgumentType;
-import fun.teamti.gravity.command.LocalDirectionArgumentType;
+import fun.teamti.gravity.command.GravityCommand;
 import fun.teamti.gravity.config.GravityAPIConfig;
+import fun.teamti.gravity.init.ModArgumentType;
+import fun.teamti.gravity.init.ModItem;
 import fun.teamti.gravity.init.ModNetwork;
+import fun.teamti.gravity.util.ClientUtil;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -27,6 +30,11 @@ public class GravityMod
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GravityAPIConfig.SPEC, "gravity_api.toml");
         modEventBus.addListener(this::commonSetup);
+        MinecraftForge.EVENT_BUS.addListener(ClientUtil::showWarningOnJoin);
+        MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> GravityCommand.register(event.getDispatcher()));
+
+        ModArgumentType.ARGUMENT_TYPES.register(modEventBus);
+        ModItem.ITEMS.register(modEventBus);
         //GravityChangerItem.init();
         //GravityChangerItemAOE.init();
         //GravityAnchorItem.init();
@@ -39,9 +47,6 @@ public class GravityMod
         //GravityPlatingBlock.init();
         //GravityPlatingItem.init();
         //GravityPlatingBlockEntity.init();
-
-        DirectionArgumentType.init();
-        LocalDirectionArgumentType.init();
 
         MinecraftForge.EVENT_BUS.register(this);
     }

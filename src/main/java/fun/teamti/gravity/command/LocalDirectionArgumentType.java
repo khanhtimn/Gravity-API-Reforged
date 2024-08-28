@@ -8,10 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.synchronization.ArgumentTypeInfos;
-import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class LocalDirectionArgumentType implements ArgumentType<LocalDirection> {
     
-    public static final LocalDirectionArgumentType instance = new LocalDirectionArgumentType();
+    public static final LocalDirectionArgumentType INSTANCE = new LocalDirectionArgumentType();
     
     public static final DynamicCommandExceptionType exceptionType =
         new DynamicCommandExceptionType(object ->
@@ -59,13 +56,5 @@ public class LocalDirectionArgumentType implements ArgumentType<LocalDirection> 
     public Collection<String> getExamples() {
         return Arrays.stream(LocalDirection.values())
             .map(Enum::toString).collect(Collectors.toList());
-    }
-    
-    public static void init() {
-        ArgumentTypeInfos.registerByClass(
-            //new ResourceLocation("gravity_changer:local_direction"),
-            LocalDirectionArgumentType.class,
-            SingletonArgumentInfo.contextFree(() -> LocalDirectionArgumentType.instance)
-        );
     }
 }

@@ -46,6 +46,7 @@
     "ProjectileMixin",
     "RamTargetMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerLevelMixin",
     "ServerPlayerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerMixin",
@@ -62,6 +63,7 @@
   "client": [
     "client.BiomeAmbientSoundHandlerMixin",
     "client.CameraMixin",
+    "client.ClientLevelMixin",
     "client.ClientPacketListenerMixin",
     "client.EntityRenderDispatcherMixin",
     "client.EntityRenderMixin",

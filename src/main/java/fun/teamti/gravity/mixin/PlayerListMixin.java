@@ -5,4 +5,5 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PlayerList.class)
 public abstract class PlayerListMixin {
+
 }
