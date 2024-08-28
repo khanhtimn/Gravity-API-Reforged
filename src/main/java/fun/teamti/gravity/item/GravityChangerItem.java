@@ -19,7 +19,7 @@ import java.util.List;
 
 public class GravityChangerItem extends Item {
 
-    public final Direction gravityDirection;
+    private final Direction gravityDirection;
 
     public GravityChangerItem(Properties properties, Direction pDirection) {
         super(properties);

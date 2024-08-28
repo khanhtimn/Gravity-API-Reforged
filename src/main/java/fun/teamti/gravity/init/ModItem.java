@@ -1,6 +1,7 @@
 package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
+import fun.teamti.gravity.item.GravityAnchorItem;
 import fun.teamti.gravity.item.GravityChangerItem;
 import fun.teamti.gravity.item.GravityChangerItemAOE;
 import net.minecraft.core.Direction;
@@ -48,4 +49,23 @@ public class ModItem {
 
     public static final RegistryObject<Item> GRAVITY_CHANGER_EAST_AOE = ITEMS.register("gravity_changer_east_aoe",
             () -> new GravityChangerItemAOE(new Item.Properties().stacksTo(1), Direction.EAST));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_DOWN = ITEMS.register("gravity_anchor_down",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.DOWN));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_UP = ITEMS.register("gravity_anchor_up",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.UP));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_NORTH = ITEMS.register("gravity_anchor_north",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.NORTH));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_SOUTH = ITEMS.register("gravity_anchor_south",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.SOUTH));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_WEST = ITEMS.register("gravity_anchor_west",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.WEST));
+
+    public static final RegistryObject<Item> GRAVITY_ANCHOR_EAST = ITEMS.register("gravity_anchor_east",
+            () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.EAST));
+
 }

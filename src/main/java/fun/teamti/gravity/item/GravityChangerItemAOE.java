@@ -16,7 +16,7 @@ import java.util.List;
 
 public class GravityChangerItemAOE extends Item {
 
-    public final Direction gravityDirection;
+    private final Direction gravityDirection;
     
     public GravityChangerItemAOE(Properties properties, Direction pDirection) {
         super(properties);
