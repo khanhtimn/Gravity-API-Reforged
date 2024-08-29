@@ -1,7 +1,5 @@
-package fun.teamti.gravity;
+package fun.teamti.gravity.util;
 
-import fun.teamti.gravity.util.QuaternionUtil;
-import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;

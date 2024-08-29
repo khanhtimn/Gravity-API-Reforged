@@ -2,7 +2,7 @@ package fun.teamti.gravity.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import fun.teamti.gravity.RotationAnimation;
+import fun.teamti.gravity.util.RotationAnimation;
 import fun.teamti.gravity.api.GravityAPI;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;

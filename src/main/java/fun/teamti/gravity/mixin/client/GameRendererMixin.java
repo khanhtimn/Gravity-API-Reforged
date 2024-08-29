@@ -1,7 +1,7 @@
 package fun.teamti.gravity.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fun.teamti.gravity.RotationAnimation;
+import fun.teamti.gravity.util.RotationAnimation;
 import fun.teamti.gravity.api.GravityAPI;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;

@@ -19,7 +19,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-// based on AmethystGravity
+/**
+ * Based on code from AmethystGravity (by CyborgCabbage)
+ */
 public class GravityAnchorItem extends Item {
 
     private final Direction gravityDirection;
@@ -40,8 +42,8 @@ public class GravityAnchorItem extends Item {
                         Item item = handSlot.getItem();
                         if (item instanceof GravityAnchorItem anchorItem) {
                             gravityData.applyGravityDirectionEffect(
-                                anchorItem.gravityDirection,
-                                null, 1000000
+                                    anchorItem.gravityDirection,
+                                    null, 1000000
                             );
                         }
                     }

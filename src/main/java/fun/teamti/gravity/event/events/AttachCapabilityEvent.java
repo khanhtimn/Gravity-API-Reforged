@@ -7,6 +7,7 @@ import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
 import fun.teamti.gravity.event.GravityUpdateEvent;
 import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.init.ModNetwork;
+import fun.teamti.gravity.init.ModTag;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -23,7 +24,7 @@ public class AttachCapabilityEvent {
     @SubscribeEvent
     public static void onAttachCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
-        if (entity != null && !entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
+        if (entity != null && ModTag.canChangeGravity(entity) && !entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
             String isClientSide = entity.level().isClientSide() ? "from clientside" : "";
             GravityMod.LOGGER.info("Attaching gravity data capability to entity: {} {}", entity.getClass().getSimpleName(), isClientSide);
             event.addCapability(
@@ -46,12 +47,18 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onGravityUpdateEvent(GravityUpdateEvent event) {
+        if (!(ModTag.canChangeGravity(event.getEntity()))) {
+            return;
+        }
         event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
     }
 
     @SubscribeEvent
     public static void onPLayerStartTracking(PlayerEvent.StartTracking event) {
         Entity entity = event.getTarget();
+        if (!(ModTag.canChangeGravity(entity))) {
+            return;
+        }
         event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
             GravityDataSyncPacket.sendToClient(entity, gravityData.serializeNBT(), ModNetwork.INSTANCE);
         });

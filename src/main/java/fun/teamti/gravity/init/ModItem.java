@@ -4,6 +4,7 @@ import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.item.GravityAnchorItem;
 import fun.teamti.gravity.item.GravityChangerItem;
 import fun.teamti.gravity.item.GravityChangerItemAOE;
+import fun.teamti.gravity.block.GravityPlatingItem;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
@@ -67,5 +68,8 @@ public class ModItem {
 
     public static final RegistryObject<Item> GRAVITY_ANCHOR_EAST = ITEMS.register("gravity_anchor_east",
             () -> new GravityAnchorItem(new Item.Properties().stacksTo(1), Direction.EAST));
+
+    public static final RegistryObject<Item> PLATING_BLOCK_ITEM = ITEMS.register("plating",
+            () -> new GravityPlatingItem(ModBlock.PLATING_BLOCK.get(), new Item.Properties()));
 
 }

@@ -3,7 +3,6 @@ package fun.teamti.gravity.util;
 import com.mojang.math.Axis;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
@@ -254,5 +253,17 @@ public abstract class RotationUtil {
     public static AABB makeBoxFromDimensions(EntityDimensions dimensions, Direction gravityDir, Vec3 pos) {
         AABB rawBox = dimensions.makeBoundingBox(0, 0, 0);
         return boxPlayerToWorld(rawBox, gravityDir).move(pos);
+    }
+
+    public static double distanceToRange(double value, double rangeStart, double rangeEnd) {
+        if (value < rangeStart) {
+            return rangeStart - value;
+        }
+
+        if (value > rangeEnd) {
+            return value - rangeEnd;
+        }
+
+        return 0;
     }
 }

@@ -3,7 +3,7 @@ package fun.teamti.gravity.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fun.teamti.gravity.api.GravityAPI;
-import fun.teamti.gravity.config.GravityAPIConfig;
+import fun.teamti.gravity.init.ModConfig;
 import fun.teamti.gravity.event.GravityUpdateEvent;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
@@ -630,7 +630,7 @@ public abstract class EntityMixin {
         Entity this_ = (Entity) (Object) this;
 
         Direction gravityDirection = GravityAPI.getGravityDirection(this_);
-        if (GravityAPIConfig.VOID_DAMAGE_ABOVE_WORLD.get() &&
+        if (ModConfig.VOID_DAMAGE_ABOVE_WORLD.get() &&
                 this.getY() > (double) (this.level.getMaxBuildHeight() + 256) &&
                 gravityDirection == Direction.UP
         ) {
@@ -639,7 +639,7 @@ public abstract class EntityMixin {
             return;
         }
 
-        if (GravityAPIConfig.VOID_DAMAGE_ON_HORIZONTAL_FALL_TOO_FAR.get() &&
+        if (ModConfig.VOID_DAMAGE_ON_HORIZONTAL_FALL_TOO_FAR.get() &&
                 gravityDirection.getAxis() != Direction.Axis.Y &&
                 fallDistance > 1024
             // TODO also handle reverse gravity strength

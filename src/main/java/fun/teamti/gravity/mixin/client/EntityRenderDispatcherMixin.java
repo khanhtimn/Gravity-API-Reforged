@@ -2,8 +2,8 @@ package fun.teamti.gravity.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fun.teamti.gravity.EntityTags;
-import fun.teamti.gravity.RotationAnimation;
+import fun.teamti.gravity.init.ModTag;
+import fun.teamti.gravity.util.RotationAnimation;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -54,7 +54,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
+        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && ModTag.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) return;
 
@@ -77,7 +77,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
+        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && ModTag.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) return;
 
@@ -95,7 +95,7 @@ public abstract class EntityRenderDispatcherMixin {
             )
     )
     private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
-        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && EntityTags.allowGravityTransformationInRendering(entity)) {
+        if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && ModTag.allowGravityTransformationInRendering(entity)) {
             Direction gravityDirection = GravityAPI.getGravityDirection(entity);
             if (gravityDirection == Direction.DOWN) return;
             if (!this.shouldRenderShadow) return;

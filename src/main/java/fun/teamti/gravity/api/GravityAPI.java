@@ -3,8 +3,8 @@ package fun.teamti.gravity.api;
 import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.capability.dimension.DimensionGravityData;
-import fun.teamti.gravity.EntityTags;
-import fun.teamti.gravity.RotationAnimation;
+import fun.teamti.gravity.init.ModTag;
+import fun.teamti.gravity.util.RotationAnimation;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -66,7 +66,7 @@ public abstract class GravityAPI {
     }
 
     public static void resetGravity(Entity entity) {
-        if (!EntityTags.canChangeGravity(entity)) {
+        if (!ModTag.canChangeGravity(entity)) {
             return;
         }
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
@@ -154,7 +154,7 @@ public abstract class GravityAPI {
     }
 
     public static boolean canChangeGravity(Entity entity) {
-        return EntityTags.canChangeGravity(entity);
+        return ModTag.canChangeGravity(entity);
     }
 
 }

@@ -1,6 +1,5 @@
 package fun.teamti.gravity.api;
 
-import fun.teamti.gravity.config.GravityAPIConfig;
 import net.minecraft.nbt.CompoundTag;
 
 public record RotationParameters (

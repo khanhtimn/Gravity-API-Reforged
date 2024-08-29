@@ -1,9 +1,9 @@
 package fun.teamti.gravity.capability.data;
 
-import fun.teamti.gravity.EntityTags;
+import fun.teamti.gravity.init.ModTag;
 import fun.teamti.gravity.GravityMod;
-import fun.teamti.gravity.RotationAnimation;
-import fun.teamti.gravity.config.GravityAPIConfig;
+import fun.teamti.gravity.util.RotationAnimation;
+import fun.teamti.gravity.init.ModConfig;
 import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.mixin.EntityAccessor;
 import fun.teamti.gravity.api.GravityAPI;
@@ -197,7 +197,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             currGravityDirection = baseGravityDirection;
             currGravityStrength = baseGravityStrength;
             currGravityStrength *= GravityAPI.getDimensionGravityStrength(entity.level());
-            currGravityStrength *= GravityAPIConfig.GRAVITY_STRENGTH_MULTIPLIER.get();
+            currGravityStrength *= ModConfig.GRAVITY_STRENGTH_MULTIPLIER.get();
             // the rotation parameters is not being reset here
             // the rotation parameter is kept when an effect vanishes
             currentEffectPriority = Double.MIN_VALUE;
@@ -378,7 +378,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
     private void adjustEntityPosition(Direction oldGravity, Direction newGravity, AABB entityBoundingBox) {
-        if (!GravityAPIConfig.ADJUST_POSITION_AFTER_CHANGING_GRAVITY.get()) {
+        if (!ModConfig.ADJUST_POSITION_AFTER_CHANGING_GRAVITY.get()) {
             return;
         }
 
@@ -440,7 +440,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
     private boolean canChangeGravity() {
-        return EntityTags.canChangeGravity(entity);
+        return ModTag.canChangeGravity(entity);
     }
 
     public double getBaseGravityStrength() {

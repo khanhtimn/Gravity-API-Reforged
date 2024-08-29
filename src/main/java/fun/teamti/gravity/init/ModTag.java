@@ -1,5 +1,6 @@
-package fun.teamti.gravity;
+package fun.teamti.gravity.init;
 
+import fun.teamti.gravity.GravityMod;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -9,7 +10,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class EntityTags {
+public class ModTag {
     /**
      * It's a whitelist for the non-living/non-projectile/non-minecart entities that can change gravity.
      * <p>

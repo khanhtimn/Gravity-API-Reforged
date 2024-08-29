@@ -1,9 +1,9 @@
-package fun.teamti.gravity.config;
+package fun.teamti.gravity.init;
 
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class GravityAPIConfig {
+public class ModConfig {
 
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
