@@ -4,16 +4,16 @@ import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.capability.data.GravityDataProvider;
 import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
-import fun.teamti.gravity.event.GravityUpdateEvent;
 import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.init.ModTag;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -46,7 +46,7 @@ public class AttachCapabilityEvent {
     }
 
     @SubscribeEvent
-    public static void onGravityUpdateEvent(GravityUpdateEvent event) {
+    public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         if (!(ModTag.canChangeGravity(event.getEntity()))) {
             return;
         }
@@ -59,16 +59,18 @@ public class AttachCapabilityEvent {
         if (!(ModTag.canChangeGravity(entity))) {
             return;
         }
-        event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
             GravityDataSyncPacket.sendToClient(entity, gravityData.serializeNBT(), ModNetwork.INSTANCE);
         });
     }
 
     @SubscribeEvent
     public static void onPlayerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
-        event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
             GravityDataSyncPacket.sendToClient(player, gravityData.serializeNBT(), ModNetwork.INSTANCE);
         });
     }
+
+    //TODO: onPlayerClone
 }

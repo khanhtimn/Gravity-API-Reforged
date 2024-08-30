@@ -52,26 +52,6 @@ public class GravityAnchorItem extends Item {
         }
     }
 
-//    public static void init() {
-//        for (Direction direction : Direction.values()) {
-//            Registry.register(
-//                BuiltInRegistries.ITEM, getItemId(direction), ITEM_MAP.get(direction)
-//            );
-//        }
-//
-//        GravityData.GRAVITY_UPDATE_EVENT.register((entity, component) -> {
-//            for (ItemStack handSlot : entity.getHandSlots()) {
-//                Item item = handSlot.getItem();
-//                if (item instanceof GravityAnchorItem anchorItem) {
-//                    component.applyGravityDirectionEffect(
-//                        anchorItem.direction,
-//                        null, 1000000
-//                    );
-//                }
-//            }
-//        });
-//    }
-
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(@NotNull ItemStack itemStack, Level world, List<Component> tooltip, @NotNull TooltipFlag tooltipContext) {

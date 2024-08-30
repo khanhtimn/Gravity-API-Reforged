@@ -2,7 +2,6 @@ package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
-import fun.teamti.gravity.network.GravityDataSyncPacket2;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -24,10 +23,5 @@ public class ModNetwork {
                 GravityDataSyncPacket::toBytes,
                 GravityDataSyncPacket::new,
                 GravityDataSyncPacket::handle);
-
-        INSTANCE.registerMessage(nextID(), GravityDataSyncPacket2.class,
-                GravityDataSyncPacket2::toBytes,
-                GravityDataSyncPacket2::new,
-                GravityDataSyncPacket2::handle);
     }
 }

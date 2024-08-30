@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.init.ModConfig;
-import fun.teamti.gravity.event.GravityUpdateEvent;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +22,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -126,16 +124,16 @@ public abstract class EntityMixin {
     @Shadow
     public abstract void tick();
 
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    public void onTick(CallbackInfo ci) {
-        Entity entity = (Entity) (Object) this;
-        GravityUpdateEvent event = new GravityUpdateEvent(entity);
-        MinecraftForge.EVENT_BUS.post(event);
-
-        if (event.isCanceled()) {
-            ci.cancel();
-        }
-    }
+//    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+//    public void onTick(CallbackInfo ci) {
+//        Entity entity = (Entity) (Object) this;
+//        GravityUpdateEvent event = new GravityUpdateEvent(entity);
+//        MinecraftForge.EVENT_BUS.post(event);
+//
+//        if (event.isCanceled()) {
+//            ci.cancel();
+//        }
+//    }
 
     @Inject(
             method = "makeBoundingBox()Lnet/minecraft/world/phys/AABB;",

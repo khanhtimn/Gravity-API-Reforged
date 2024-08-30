@@ -24,7 +24,7 @@ public class GravityMod
     public GravityMod()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, ModConfig.SPEC, "gravity_api.toml");
+        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.SPEC, "gravity_api.toml");
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(ClientUtil::showWarningOnJoin);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> GravityCommand.register(event.getDispatcher()));

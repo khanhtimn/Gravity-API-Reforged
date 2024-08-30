@@ -17,82 +17,77 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityAPI {
 
-//    public static GravityData getGravityData(Entity entity) {
-//        return entity.getCapability(ModCapability.GRAVITY_DATA).orElse(new GravityDataProvider(entity).getGravityData());
-//    }
-//
-//    public static DimensionGravityData getDimensionGravityData(Level level) {
-//        return level.getCapability(ModCapability.DIMENSION_GRAVITY_DATA).orElse(new DimensionGravityDataProvider(level).getDimensionGravityData());
-//    }
-
     /**
      * Returns the applied gravity direction for the given entity
      */
     public static Direction getGravityDirection(Entity entity) {
-
-//        GravityData gravityData = getGravityComponentEarly(entity);
-//
-//        if (gravityData == null) {
-//            return Direction.DOWN;
-//        }
-//
-//        return gravityData.getCurrGravityDirection();
         return entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getCurrGravityDirection).orElse(Direction.DOWN);
     }
 
+    /**
+     * Returns the gravity strength for the given entity
+     */
     public static double getGravityStrength(Entity entity) {
         return entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getCurrGravityStrength).orElse(1.0);
-        //return getGravityData(entity).getCurrGravityStrength();
     }
 
+    /**
+     * Returns the base gravity strength for the given entity
+     */
     public static double getBaseGravityStrength(Entity entity) {
         return entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityStrength).orElse(1.0);
-        //return getGravityData(entity).getBaseGravityStrength();
     }
 
+    /**
+     * Sets the base gravity strength for the given entity
+     */
     public static void setBaseGravityStrength(Entity entity, double strength) {
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(data -> data.setBaseGravityStrength(strength));
-        //getGravityData(entity).setBaseGravityStrength(strength);
     }
 
+    /**
+     * Returns the gravity strength for the given dimension
+     */
     public static double getDimensionGravityStrength(Level level) {
         return level.getCapability(ModCapability.DIMENSION_GRAVITY_DATA).map(DimensionGravityData::getDimensionGravityStrength).orElse(1.0);
-        //return getDimensionGravityData(level).getDimensionGravityStrength();
     }
 
+    /**
+     * Sets the gravity strength for the given dimension
+     */
     public static void setDimensionGravityStrength(Level level, double strength) {
         level.getCapability(ModCapability.DIMENSION_GRAVITY_DATA).ifPresent(data -> data.setDimensionGravityStrength(strength));
-        //getDimensionGravityData(level).setDimensionGravityStrength(strength);
     }
 
+    /**
+     * Resets the gravity (Direction.DOWN, Strength == 1.0F) for the given entity
+     */
     public static void resetGravity(Entity entity) {
         if (!ModTag.canChangeGravity(entity)) {
             return;
         }
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
-        //getGravityData(entity).reset();
     }
 
     /**
-     * Returns the main gravity direction for the given entity
-     * This may not be the applied gravity direction for the player, see GravityChangerAPI#getAppliedGravityDirection
+     * Returns the main gravity direction for the given entity. This may not be the applied gravity direction for the player.
+     * For the applied gravity direction of the entity, {@link GravityAPI#getGravityDirection(Entity entity)}
      */
     public static Direction getBaseGravityDirection(Entity entity) {
         return entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getBaseGravityDirection).orElse(Direction.DOWN);
-        //return getGravityData(entity).getBaseGravityDirection();
     }
 
+    /**
+     * Sets the base gravity direction for the given entity. This may not be the applied gravity direction for the player.
+     */
     public static void setBaseGravityDirection(Entity entity, Direction gravityDirection) {
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(data -> data.setBaseGravityDirection(gravityDirection));
-        //GravityData component = getGravityData(entity);
-        //component.setBaseGravityDirection(gravityDirection);
     }
 
     @Nullable
     @OnlyIn(Dist.CLIENT)
     public static RotationAnimation getRotationAnimation(Entity entity) {
         return entity.getCapability(ModCapability.GRAVITY_DATA).map(GravityData::getRotationAnimation).orElseGet(RotationAnimation::new);
-        //return getGravityData(entity).getRotationAnimation();
     }
 
     /**
@@ -101,14 +96,8 @@ public abstract class GravityAPI {
      * (Used by iPortal)
      */
     public static void instantlySetClientBaseGravityDirection(Entity entity, Direction direction) {
-        Validate.isTrue(entity.level().isClientSide(), "should only be used on client");
 
-        //GravityData component = getGravityData(entity);
-//        component.setBaseGravityDirection(direction);
-//
-//        component.updateGravityStatus(false);
-//
-//        component.forceApplyGravityChange();
+        Validate.isTrue(entity.level().isClientSide(), "Should only be used on client");
 
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(data -> {
             data.setBaseGravityDirection(direction);
@@ -117,18 +106,6 @@ public abstract class GravityAPI {
         });
 
     }
-
-    /**
-     * cardinal components initializes the component container in the end of constructor
-     * but bounding box calculation can happen inside constructor
-     * see {@link dev.onyxstudios.cca.mixin.entity.common.MixinEntity}
-     */
-//    public static @Nullable GravityData getGravityComponentEarly(Entity entity) {
-//        if (!entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
-//            return null;
-//        }
-//        return getGravityData(entity);
-//    }
 
     /**
      * Returns the world relative velocity for the given entity
@@ -153,6 +130,9 @@ public abstract class GravityAPI {
         return RotationUtil.vecPlayerToWorld(0, (double) entity.getEyeHeight(), 0, getGravityDirection(entity));
     }
 
+    /**
+     * Returns whether an entity can change gravity
+     */
     public static boolean canChangeGravity(Entity entity) {
         return ModTag.canChangeGravity(entity);
     }

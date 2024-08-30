@@ -1,6 +1,6 @@
 package fun.teamti.gravity.capability.data;
 
-import fun.teamti.gravity.init.ModTag;
+import fun.teamti.gravity.event.GravityUpdateEvent;
 import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.util.RotationAnimation;
 import fun.teamti.gravity.init.ModConfig;
@@ -24,6 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
@@ -158,7 +159,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
     public void tick() {
-        if (!canChangeGravity()) {
+        if (!GravityAPI.canChangeGravity(entity)) {
             return;
         }
 
@@ -170,8 +171,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             if (needsSync) {
                 needsSync = false;
                 //TODO: Sync
-                //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity);
-                //GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
                 GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
             }
         }
@@ -204,8 +203,9 @@ public class GravityData implements INBTSerializable<CompoundTag> {
 
             isFiringUpdateEvent = true;
             try {
-                //TODO: Implement GRAVITY_UPDATE_EVENT
-                //GRAVITY_UPDATE_EVENT.invoker().update(entity, this);
+                GravityUpdateEvent event = new GravityUpdateEvent(entity, this);
+                MinecraftForge.EVENT_BUS.post(event);
+
                 if (delayApplyDirEffect != null) {
                     applyGravityDirectionEffect(
                             delayApplyDirEffect.direction(),
@@ -231,10 +231,14 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             boolean changed = oldGravityDirection != currGravityDirection ||
                     Math.abs(oldGravityStrength - currGravityStrength) > 0.0001;
             if (changed) {
-                //TODO: Send packet to other players
-                //GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
+                sendSyncPacketToOtherPlayers();
             }
         }
+    }
+
+    //TODO: Send packet to other players
+    private void sendSyncPacketToOtherPlayers() {
+        //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);
     }
 
     public void applyGravityDirectionEffect(
@@ -276,7 +280,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             Direction oldGravity, Direction newGravity,
             RotationParameters rotationParameters, boolean isInitialization
     ) {
-        if (!canChangeGravity()) {
+        if (!GravityAPI.canChangeGravity(entity)) {
             return;
         }
 
@@ -317,7 +321,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
 
         adjustEntityPosition(oldGravity, newGravity, entity.getBoundingBox());
 
-        //TODO: isClientSide check fail?
         if (entity.level().isClientSide()) {
             Validate.notNull(animation, "gravity animation is null");
 
@@ -439,16 +442,12 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         return new Vec3(movingDirection.step()).scale(offset);
     }
 
-    private boolean canChangeGravity() {
-        return ModTag.canChangeGravity(entity);
-    }
-
     public double getBaseGravityStrength() {
         return baseGravityStrength;
     }
 
     public void setBaseGravityStrength(double strength) {
-        if (!canChangeGravity()) {
+        if (!GravityAPI.canChangeGravity(entity)) {
             return;
         }
         baseGravityStrength = strength;
@@ -472,7 +471,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
     }
 
     public void setBaseGravityDirection(Direction gravityDirection) {
-        if (!canChangeGravity()) {
+        if (!GravityAPI.canChangeGravity(entity)) {
             return;
         }
 
@@ -510,14 +509,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public void updateFromPacket(
-            Direction currGravityDirection,
-            double currGravityStrength
-    ) {
-        this.currGravityDirection = currGravityDirection;
-        this.currGravityStrength = currGravityStrength;
-    }
-
     /**
      * Not needed in normal cases.
      * Only used in {@link GravityAPI#instantlySetClientBaseGravityDirection(Entity, Direction)}
@@ -538,8 +529,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             @NotNull Direction direction,
             @Nullable RotationParameters rotationParameters,
             double priority
-    ) {
-
-    }
+    ) {}
 
 }

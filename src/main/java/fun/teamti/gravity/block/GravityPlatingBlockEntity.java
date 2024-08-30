@@ -237,7 +237,7 @@ public class GravityPlatingBlockEntity extends BlockEntity {
     }
     
     public static void tick(Level world, BlockPos blockPos, BlockState blockState, GravityPlatingBlockEntity be) {
-        if (!(blockState.getBlock() == ModBlock.PLATING_BLOCK.get())) {
+        if (!(blockState.getBlock() instanceof GravityPlatingBlock)) {
             return;
         }
         
