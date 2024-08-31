@@ -4,7 +4,7 @@
   "minMixinExtrasVersion": "0.5.0-beta.2",
   "package": "fun.teamti.gravity.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "gravity.refmap.json",
+  "refmap": "gravity_api.refmap.json",
   "mixins": [
     "AbstractArrowMixin",
     "AbstractHorseMixin",

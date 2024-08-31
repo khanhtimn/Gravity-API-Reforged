@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fun.teamti.gravity.GravityMod;
-import fun.teamti.gravity.init.ModBlock;
-import fun.teamti.gravity.init.ModTag;
+import fun.teamti.gravity.init.*;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.capability.data.GravityData;
-import fun.teamti.gravity.init.ModConfig;
-import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
@@ -300,6 +297,11 @@ public class GravityPlatingBlockEntity extends BlockEntity {
                     gravityData.applyGravityDirectionEffect(
                         gravityEffectDir, null, priority
                     );
+
+                    if (!entity.level().isClientSide()) {
+                        gravityData.setNeedsSync(true);
+                    }
+
                     applies = true;
                 }
             }

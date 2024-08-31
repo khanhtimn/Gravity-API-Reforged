@@ -8,6 +8,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -25,7 +26,10 @@ public class GravityMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.SPEC, "gravity_api.toml");
+
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::clientSetup);
+
         MinecraftForge.EVENT_BUS.addListener(ClientUtil::showWarningOnJoin);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> GravityCommand.register(event.getDispatcher()));
 
@@ -45,6 +49,9 @@ public class GravityMod
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         ModNetwork.init();
+    }
+
+    private void clientSetup (final FMLClientSetupEvent event) {
     }
 
 }

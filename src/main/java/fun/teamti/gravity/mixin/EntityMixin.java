@@ -22,6 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -124,19 +125,17 @@ public abstract class EntityMixin {
     @Shadow
     public abstract void tick();
 
-//    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+//    @Inject(method = "tick", at = @At("HEAD"))
 //    public void onTick(CallbackInfo ci) {
-//        Entity entity = (Entity) (Object) this;
-//        GravityUpdateEvent event = new GravityUpdateEvent(entity);
-//        MinecraftForge.EVENT_BUS.post(event);
-//
-//        if (event.isCanceled()) {
-//            ci.cancel();
+//        Entity entity = ((Entity) (Object) this);
+//        if (!(ModTag.canChangeGravity(entity))) {
+//            return;
 //        }
+//        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
 //    }
 
     @Inject(
-            method = "makeBoundingBox()Lnet/minecraft/world/phys/AABB;",
+            method = "makeBoundingBox",
             at = @At("RETURN"),
             cancellable = true
     )
@@ -512,6 +511,7 @@ public abstract class EntityMixin {
         }
     }
 
+    //refers to a lambda which is why this class may cause mixin warnings/errors
     @ModifyVariable(
             method = "lambda$updateFluidHeightAndDoFluidPushing$29",
             at = @At(
@@ -519,9 +519,9 @@ public abstract class EntityMixin {
                     target = "Lnet/minecraft/world/entity/Entity;getDeltaMovement()Lnet/minecraft/world/phys/Vec3;",
                     ordinal = 0
             ),
-            ordinal = 1,
-            require = 0
+            ordinal = 0
     )
+    @Dynamic
     private Vec3 modify_updateMovementInFluid_Vec3d_0(Vec3 vec3d) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
@@ -531,15 +531,15 @@ public abstract class EntityMixin {
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
 
+    //refers to a lambda which is why this class may cause mixin warnings/errors
     @ModifyArg(
             method = "lambda$updateFluidHeightAndDoFluidPushing$29",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/phys/Vec3;add(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;",
-                    ordinal = 1
+                    ordinal = 0
             ),
-            index = 0,
-            require = 0
+            index = 0
     )
     private Vec3 modify_updateMovementInFluid_add_0(Vec3 vec3d) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
@@ -640,7 +640,6 @@ public abstract class EntityMixin {
         if (ModConfig.VOID_DAMAGE_ON_HORIZONTAL_FALL_TOO_FAR.get() &&
                 gravityDirection.getAxis() != Direction.Axis.Y &&
                 fallDistance > 1024
-            // TODO also handle reverse gravity strength
         ) {
             this.onBelowWorld();
             ci.cancel();

@@ -104,6 +104,14 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         }
     }
 
+//    public void copyFrom(GravityData original) {
+//        baseGravityDirection = original.baseGravityDirection;
+//        baseGravityStrength = original.baseGravityStrength;
+//        currGravityDirection = original.currGravityDirection;
+//        currGravityStrength = original.currGravityStrength;
+//        needsSync = true;
+//    }
+
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
@@ -156,6 +164,10 @@ public class GravityData implements INBTSerializable<CompoundTag> {
 
     public boolean shouldAcceptServerSync() {
         return entity.level().isClientSide() && !ClientUtil.isClientPlayer(entity);
+    }
+
+    public void setNeedsSync(boolean needsSync) {
+        this.needsSync = needsSync;
     }
 
     public void tick() {

@@ -170,11 +170,8 @@ public class GravityPlatingBlock extends BaseEntityBlock {
     }
     
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
-        if (world.isClientSide)
-            return createTickerHelper(type, ModBlock.PLATING_BLOCK_ENTITY.get(), GravityPlatingBlockEntity::tick);
-        else
-            return createTickerHelper(type, ModBlock.PLATING_BLOCK_ENTITY.get(), GravityPlatingBlockEntity::tick);
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level world, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
+        return createTickerHelper(type, ModBlock.PLATING_BLOCK_ENTITY.get(), GravityPlatingBlockEntity::tick);
     }
     
     @Override
@@ -246,7 +243,7 @@ public class GravityPlatingBlock extends BaseEntityBlock {
     }
     
     @Override
-    public InteractionResult use(
+    public @NotNull InteractionResult use(
             @NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player,
             @NotNull InteractionHand hand, @NotNull BlockHitResult hit
     ) {
@@ -291,7 +288,7 @@ public class GravityPlatingBlock extends BaseEntityBlock {
     }
     
     @Override
-    public List<ItemStack> getDrops(@NotNull BlockState blockState, LootParams.Builder builder) {
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState blockState, LootParams.Builder builder) {
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof GravityPlatingBlockEntity be) {
             return be.getDrops();
