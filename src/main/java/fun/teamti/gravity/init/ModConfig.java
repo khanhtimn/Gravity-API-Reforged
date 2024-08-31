@@ -11,6 +11,8 @@ public class ModConfig {
     public static final ForgeConfigSpec.BooleanValue WORLD_VELOCITY;
     public static final ForgeConfigSpec.DoubleValue GRAVITY_STRENGTH_MULTIPLIER;
     public static final ForgeConfigSpec.BooleanValue RESET_GRAVITY_ON_RESPAWN;
+    public static final ForgeConfigSpec.BooleanValue RESET_GRAVITY_ON_CHANGED_DIMENSION;
+    public static final ForgeConfigSpec.BooleanValue SPAWNED_ENTITY_INHERIT_OWNER_GRAVITY;
     public static final ForgeConfigSpec.BooleanValue VOID_DAMAGE_ABOVE_WORLD;
     public static final ForgeConfigSpec.BooleanValue VOID_DAMAGE_ON_HORIZONTAL_FALL_TOO_FAR;
     public static final ForgeConfigSpec.BooleanValue AUTO_JUMP_ON_GRAVITY_PLATE_INNER_CORNER;
@@ -37,6 +39,16 @@ public class ModConfig {
                         If enabled,
                         Default: true""")
                 .define("resetGravityOnRespawn", true);
+        RESET_GRAVITY_ON_CHANGED_DIMENSION = BUILDER
+                .comment("""
+                        If enabled,
+                        Default: false""")
+                .define("resetGravityChangedDimension", false);
+        SPAWNED_ENTITY_INHERIT_OWNER_GRAVITY = BUILDER
+                .comment("""
+                        If enabled,
+                        Default: true""")
+                .define("spawnedEntityInheritOwnerGravity", true);
         VOID_DAMAGE_ABOVE_WORLD = BUILDER
                 .comment("""
                         If enabled,
