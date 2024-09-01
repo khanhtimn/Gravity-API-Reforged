@@ -1,5 +1,7 @@
 package fun.teamti.gravity.capability.dimension;
 
+import fun.teamti.gravity.init.ModNetwork;
+import fun.teamti.gravity.network.DimensionGravitySyncPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -23,6 +25,7 @@ public class DimensionGravityData implements INBTSerializable<CompoundTag> {
             dimensionGravityStrength = strength;
         }
         //TODO: Sync state of client and server
+        DimensionGravitySyncPacket.sendToServer(currentWorld, serializeNBT(), ModNetwork.INSTANCE);
     }
 
     @Override

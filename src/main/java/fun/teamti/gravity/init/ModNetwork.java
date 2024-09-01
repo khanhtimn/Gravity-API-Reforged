@@ -1,6 +1,7 @@
 package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
+import fun.teamti.gravity.network.DimensionGravitySyncPacket;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
@@ -23,5 +24,10 @@ public class ModNetwork {
                 GravityDataSyncPacket::toBytes,
                 GravityDataSyncPacket::new,
                 GravityDataSyncPacket::handle);
+
+        INSTANCE.registerMessage(nextID(), DimensionGravitySyncPacket.class,
+                DimensionGravitySyncPacket::toBytes,
+                DimensionGravitySyncPacket::new,
+                DimensionGravitySyncPacket::handle);
     }
 }

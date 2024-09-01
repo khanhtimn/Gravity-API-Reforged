@@ -1,6 +1,7 @@
 package fun.teamti.gravity.event.events;
 
 import fun.teamti.gravity.GravityMod;
+import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.capability.data.GravityDataProvider;
 import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
 import fun.teamti.gravity.init.ModCapability;
@@ -8,6 +9,7 @@ import fun.teamti.gravity.init.ModConfig;
 import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.init.ModTag;
 import fun.teamti.gravity.network.GravityDataSyncPacket;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -92,23 +94,38 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        if (event.getEntity().level().isClientSide() || !ModConfig.RESET_GRAVITY_ON_RESPAWN.get()) {
+        if (event.getEntity().level().isClientSide()) {
             return;
         }
-        event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
-            event.getOriginal().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                gravityData.deserializeNBT(originalGravityData.serializeNBT());
+        event.getOriginal().reviveCaps();
+        if (ModConfig.RESET_GRAVITY_ON_RESPAWN.get()) {
+            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
+        } else {
+            event.getOriginal().getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
+                Direction gravityEffectDir = originalGravityData.getCurrGravityDirection();
+                event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                    gravityData.applyGravityDirectionEffect(
+                            gravityEffectDir, null, 1000
+                    );
+                    gravityData.setNeedsSync(true);
+                });
             });
-        });
+        }
+        event.getOriginal().invalidateCaps();
     }
 
     @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.getEntity().level().isClientSide() || !ModConfig.RESET_GRAVITY_ON_CHANGED_DIMENSION.get()) {
+        if (event.getEntity().level().isClientSide()) {
             return;
         }
-        event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            GravityDataSyncPacket.sendToClient(event.getEntity(), gravityData.serializeNBT(), ModNetwork.INSTANCE);
-        });
+        if (ModConfig.RESET_GRAVITY_ON_CHANGED_DIMENSION.get()) {
+            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
+        } else {
+            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                GravityDataSyncPacket.sendToClient(event.getEntity(), gravityData.serializeNBT(), ModNetwork.INSTANCE);
+            });
+        }
+
     }
 }

@@ -13,27 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class DimensionGravityDataProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-//    private DimensionGravityData dimensionGravityData = null;
-//    private final LazyOptional<DimensionGravityData> dimensionGravityDataOptional = LazyOptional.of(this::createDimensionGravityData);
-//
-//    private DimensionGravityData createDimensionGravityData() {
-//        if(this.dimensionGravityData == null) {
-//            dimensionGravityData = new DimensionGravityData();
-//        }
-//        return dimensionGravityData;
-//    }
-//
-
     private final DimensionGravityData dimensionGravityData;
     private final LazyOptional<DimensionGravityData> dimensionGravityDataOptional;
 
     public DimensionGravityDataProvider(Level level) {
         this.dimensionGravityData = new DimensionGravityData(level);
         this.dimensionGravityDataOptional = LazyOptional.of(() -> dimensionGravityData);
-    }
-
-    public DimensionGravityData getDimensionGravityData() {
-        return dimensionGravityData;
     }
 
     @Override
