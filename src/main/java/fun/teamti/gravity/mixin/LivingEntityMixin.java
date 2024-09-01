@@ -19,11 +19,9 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -555,7 +553,14 @@ public abstract class LivingEntityMixin extends Entity {
 //        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
 //    }
 
-    @ModifyConstant(method = "travel(Lnet/minecraft/world/phys/Vec3;)V", constant = @Constant(doubleValue = 0.08))
+    @ModifyVariable(
+            method = "travel(Lnet/minecraft/world/phys/Vec3;)V",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/world/entity/ai/attributes/AttributeInstance;getValue()D",
+                    ordinal = 0
+            )
+    )
     private double multiplyGravity(double constant) {
         return constant * GravityAPI.getGravityStrength(this);
     }
