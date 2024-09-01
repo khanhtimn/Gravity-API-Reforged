@@ -1,8 +1,7 @@
 package fun.teamti.gravity.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fun.teamti.gravity.api.GravityAPI;
+import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.init.ModConfig;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
@@ -125,15 +124,6 @@ public abstract class EntityMixin {
     @Shadow
     public abstract void tick();
 
-//    @Inject(method = "tick", at = @At("HEAD"))
-//    public void onTick(CallbackInfo ci) {
-//        Entity entity = ((Entity) (Object) this);
-//        if (!(ModTag.canChangeGravity(entity))) {
-//            return;
-//        }
-//        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
-//    }
-
     @Inject(
             method = "makeBoundingBox",
             at = @At("RETURN"),
@@ -143,6 +133,10 @@ public abstract class EntityMixin {
         Entity entity = ((Entity) (Object) this);
         if (entity instanceof Projectile) return;
 
+        if(!entity.getCapability(ModCapability.GRAVITY_DATA).isPresent()) {
+            return;
+        }
+
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) return;
 
@@ -150,6 +144,23 @@ public abstract class EntityMixin {
         if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
             box = box.move(0.0D, -1.0E-6D, 0.0D);
         }
+        cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
+    }
+
+    @Inject(
+            method = "getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;",
+            at = @At("RETURN"),
+            cancellable = true
+    )
+    private void inject_calculateBoundsForPose(Pose pos, CallbackInfoReturnable<AABB> cir) {
+        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
+        if (gravityDirection == Direction.DOWN) return;
+
+        AABB box = cir.getReturnValue().move(this.position.reverse());
+        box = box.inflate(-0.01); // avoid entering crouching because of floating point inaccuracy
+//        if (gravityDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+//
+//        }
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(this.position));
     }
 
@@ -687,21 +698,21 @@ public abstract class EntityMixin {
         return blockpos;
     }
 
-    @WrapOperation(
-            method = "canEnterPose",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;"
-            )
-    )
-    private AABB wrapOperation_canEnterPoseAndEntitiesWhen_getBoundingBox(
-            Entity entity, Pose pPose, Operation<AABB> original
-    ) {
-        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, pPose);
-        }
-
-        return RotationUtil.makeBoxFromDimensions(entity.getDimensions(pPose), gravityDirection, entity.getEyePosition());
-    }
+//    @WrapOperation(
+//            method = "canEnterPose",
+//            at = @At(
+//                    value = "INVOKE",
+//                    target = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;"
+//            )
+//    )
+//    private AABB wrapOperation_canEnterPoseAndEntitiesWhen_getBoundingBox(
+//            Entity entity, Pose pPose, Operation<AABB> original
+//    ) {
+//        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
+//        if (gravityDirection == Direction.DOWN) {
+//            return original.call(entity, pPose);
+//        }
+//
+//        return RotationUtil.makeBoxFromDimensions(entity.getDimensions(pPose), gravityDirection, entity.getEyePosition());
+//    }
 }
