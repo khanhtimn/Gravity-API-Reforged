@@ -8,8 +8,8 @@ import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.init.ModConfig;
 import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.init.ModTag;
-import fun.teamti.gravity.network.GravityDataSyncPacket;
-import net.minecraft.core.Direction;
+import fun.teamti.gravity.network.DimensionGravitySyncPacket;
+import fun.teamti.gravity.network.client.GravityDataSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +20,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = GravityMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AttachCapabilityEvent {
@@ -39,36 +40,12 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onAttachCapabilitiesLevelChunk(AttachCapabilitiesEvent<Level> event) {
-        if (event.getObject() instanceof Level
-                && !event.getObject().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).isPresent()
-        ) {
+        if (!event.getObject().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).isPresent()) {
             event.addCapability(
                     new ResourceLocation(GravityMod.MOD_ID, "dimension_data"),
                     new DimensionGravityDataProvider(event.getObject())
             );
         }
-    }
-
-    @SubscribeEvent
-    public static void onPLayerStartTracking(PlayerEvent.StartTracking event) {
-        Entity entity = event.getTarget();
-        if (!(ModTag.canChangeGravity(entity)) && entity.level().isClientSide()) {
-            return;
-        }
-        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            GravityDataSyncPacket.sendToClient(entity, gravityData.serializeNBT(), ModNetwork.INSTANCE);
-        });
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity().level().isClientSide()) {
-            return;
-        }
-        ServerPlayer player = (ServerPlayer) event.getEntity();
-        player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            GravityDataSyncPacket.sendToClient(player, gravityData.serializeNBT(), ModNetwork.INSTANCE);
-        });
     }
 
     @SubscribeEvent
@@ -83,9 +60,9 @@ public class AttachCapabilityEvent {
         if (newEntity instanceof TraceableEntity traceableEntity) {
             Entity owner = traceableEntity.getOwner();
             if (owner != null) {
-                owner.getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
+                owner.getCapability(ModCapability.GRAVITY_DATA).ifPresent(ownerGravityData -> {
                     ((Entity) traceableEntity).getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                        gravityData.deserializeNBT(originalGravityData.serializeNBT());
+                        gravityData.deserializeNBT(ownerGravityData.serializeNBT());
                     });
                 });
             }
@@ -93,25 +70,58 @@ public class AttachCapabilityEvent {
     }
 
     @SubscribeEvent
+    public static void onPLayerStartTracking(PlayerEvent.StartTracking event) {
+        Entity entity = event.getTarget();
+        if (!(ModTag.canChangeGravity(entity)) && entity.level().isClientSide()) {
+            return;
+        }
+        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+            ModNetwork.INSTANCE.send(
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
+                    new GravityDataSyncPacket(entity, gravityData.serializeNBT())
+            );
+        });
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity().level().isClientSide()) {
+            return;
+        }
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+            ModNetwork.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> player),
+                    new GravityDataSyncPacket(player, gravityData.serializeNBT())
+            );
+            player.level().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).ifPresent(dimensionGravityData -> {
+                DimensionGravitySyncPacket.sendToClient(player, dimensionGravityData);
+            });
+        });
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.getEntity().level().isClientSide()) {
             return;
         }
-        event.getOriginal().reviveCaps();
+        ServerPlayer originalPlayer = (ServerPlayer) event.getOriginal();
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        originalPlayer.reviveCaps();
         if (ModConfig.RESET_GRAVITY_ON_RESPAWN.get()) {
-            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
+            player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
         } else {
-            event.getOriginal().getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
-                Direction gravityEffectDir = originalGravityData.getCurrGravityDirection();
-                event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                    gravityData.applyGravityDirectionEffect(
-                            gravityEffectDir, null, 1000
+            //TODO: Currently not syncing (issues with order of giving caps?)
+            originalPlayer.getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
+                player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                    ModNetwork.INSTANCE.send(
+                            PacketDistributor.PLAYER.with(() -> player),
+                            new GravityDataSyncPacket(player, originalGravityData.serializeNBT())
                     );
-                    gravityData.setNeedsSync(true);
                 });
             });
         }
-        event.getOriginal().invalidateCaps();
+        originalPlayer.invalidateCaps();
     }
 
     @SubscribeEvent
@@ -119,11 +129,18 @@ public class AttachCapabilityEvent {
         if (event.getEntity().level().isClientSide()) {
             return;
         }
+        ServerPlayer player = (ServerPlayer) event.getEntity();
         if (ModConfig.RESET_GRAVITY_ON_CHANGED_DIMENSION.get()) {
-            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
+            player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
         } else {
-            event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                GravityDataSyncPacket.sendToClient(event.getEntity(), gravityData.serializeNBT(), ModNetwork.INSTANCE);
+            player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                ModNetwork.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() -> player),
+                        new GravityDataSyncPacket(player, gravityData.serializeNBT())
+                );
+                player.level().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).ifPresent(dimensionGravityData -> {
+                    DimensionGravitySyncPacket.sendToClient(player, dimensionGravityData);
+                });
             });
         }
 

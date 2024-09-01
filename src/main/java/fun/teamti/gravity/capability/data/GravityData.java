@@ -8,11 +8,12 @@ import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.mixin.EntityAccessor;
 import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.api.RotationParameters;
-import fun.teamti.gravity.network.GravityDataSyncPacket;
+import fun.teamti.gravity.network.client.GravityDataSyncPacket;
 import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -26,6 +27,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.network.PacketDistributor;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -104,14 +106,6 @@ public class GravityData implements INBTSerializable<CompoundTag> {
         }
     }
 
-//    public void copyFrom(GravityData original) {
-//        baseGravityDirection = original.baseGravityDirection;
-//        baseGravityStrength = original.baseGravityStrength;
-//        currGravityDirection = original.currGravityDirection;
-//        currGravityStrength = original.currGravityStrength;
-//        needsSync = true;
-//    }
-
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
@@ -183,7 +177,12 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             if (needsSync) {
                 needsSync = false;
                 //TODO: Sync
-                GravityDataSyncPacket.sendToClient(entity, serializeNBT(), ModNetwork.INSTANCE);
+                ModNetwork.INSTANCE.send(
+                        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
+                        new GravityDataSyncPacket(entity, this.serializeNBT())
+                );
+                //GravityDataSyncPacket.sendToClient(entity, this, ModNetwork.INSTANCE);
+
             }
         }
     }
@@ -250,6 +249,17 @@ public class GravityData implements INBTSerializable<CompoundTag> {
 
     //TODO: Send packet to other players
     private void sendSyncPacketToOtherPlayers() {
+        if (entity.level().isClientSide()) {
+            return;
+        }
+        entity.level().players().forEach(player -> {
+            if (player instanceof ServerPlayer && player != entity) {
+                ModNetwork.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                        new GravityDataSyncPacket(entity, this.serializeNBT())
+                );
+            }
+        });
         //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);
     }
 

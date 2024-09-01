@@ -2,7 +2,7 @@ package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.network.DimensionGravitySyncPacket;
-import fun.teamti.gravity.network.GravityDataSyncPacket;
+import fun.teamti.gravity.network.client.GravityDataSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;

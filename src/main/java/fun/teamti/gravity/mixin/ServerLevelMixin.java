@@ -17,11 +17,11 @@ public abstract class ServerLevelMixin {
             method = "tickNonPassenger",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER)
     )
-    private void tick(Entity p_8648_, CallbackInfo ci) {
-        if (!(ModTag.canChangeGravity(p_8648_))) {
+    private void tick(Entity entity, CallbackInfo ci) {
+        if (!(ModTag.canChangeGravity(entity))) {
             return;
         }
-        p_8648_.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
+        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::tick);
     }
 
     @Inject(
