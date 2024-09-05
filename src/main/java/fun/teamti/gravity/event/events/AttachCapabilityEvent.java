@@ -6,7 +6,6 @@ import fun.teamti.gravity.capability.data.GravityDataProvider;
 import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
 import fun.teamti.gravity.init.ModCapability;
 import fun.teamti.gravity.init.ModConfig;
-import fun.teamti.gravity.init.ModNetwork;
 import fun.teamti.gravity.init.ModTag;
 import fun.teamti.gravity.network.DimensionGravitySyncPacket;
 import fun.teamti.gravity.network.client.GravityDataSyncPacket;
@@ -20,7 +19,6 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = GravityMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AttachCapabilityEvent {
@@ -76,10 +74,7 @@ public class AttachCapabilityEvent {
             return;
         }
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            ModNetwork.INSTANCE.send(
-                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-                    new GravityDataSyncPacket(entity, gravityData.serializeNBT())
-            );
+            GravityDataSyncPacket.sendToClientTracking(entity, gravityData.serializeNBT());
         });
     }
 
@@ -90,10 +85,7 @@ public class AttachCapabilityEvent {
         }
         ServerPlayer player = (ServerPlayer) event.getEntity();
         player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            ModNetwork.INSTANCE.send(
-                    PacketDistributor.PLAYER.with(() -> player),
-                    new GravityDataSyncPacket(player, gravityData.serializeNBT())
-            );
+            GravityDataSyncPacket.sendToClientPlayer(player, gravityData.serializeNBT());
             player.level().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).ifPresent(dimensionGravityData -> {
                 DimensionGravitySyncPacket.sendToClient(player, dimensionGravityData);
             });
@@ -111,13 +103,9 @@ public class AttachCapabilityEvent {
         if (ModConfig.RESET_GRAVITY_ON_RESPAWN.get()) {
             player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
         } else {
-            //TODO: Currently not syncing (issues with order of giving caps?)
             originalPlayer.getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
                 player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                    ModNetwork.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() -> player),
-                            new GravityDataSyncPacket(player, originalGravityData.serializeNBT())
-                    );
+                    gravityData.setBaseGravityDirection(originalGravityData.getCurrGravityDirection());
                 });
             });
         }
@@ -134,10 +122,7 @@ public class AttachCapabilityEvent {
             player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(GravityData::reset);
         } else {
             player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                ModNetwork.INSTANCE.send(
-                        PacketDistributor.PLAYER.with(() -> player),
-                        new GravityDataSyncPacket(player, gravityData.serializeNBT())
-                );
+                GravityDataSyncPacket.sendToClientPlayer(player, gravityData.serializeNBT());
                 player.level().getCapability(ModCapability.DIMENSION_GRAVITY_DATA).ifPresent(dimensionGravityData -> {
                     DimensionGravitySyncPacket.sendToClient(player, dimensionGravityData);
                 });

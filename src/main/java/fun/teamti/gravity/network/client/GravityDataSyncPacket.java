@@ -1,21 +1,21 @@
 package fun.teamti.gravity.network.client;
 
 
-import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.init.ModCapability;
+import fun.teamti.gravity.init.ModNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,5 +57,15 @@ public class GravityDataSyncPacket {
         levelEntity.ifPresent(entity -> entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(
                 gravityData -> gravityData.deserializeNBT(nbtData)
         ));
+    }
+
+    public static void sendToClientPlayer(ServerPlayer player, CompoundTag nbtData) {
+        GravityDataSyncPacket packet = new GravityDataSyncPacket(player, nbtData);
+        ModNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
+    public static void sendToClientTracking(Entity entity, CompoundTag nbtData) {
+        GravityDataSyncPacket packet = new GravityDataSyncPacket(entity, nbtData);
+        ModNetwork.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), packet);
     }
 }
