@@ -112,6 +112,12 @@ public abstract class EntityMixin {
     public abstract double getEyeY();
 
     @Shadow
+    public abstract float getViewYRot(float tickDelta);
+
+    @Shadow
+    public abstract float getYRot();
+
+    @Shadow
     public abstract float getXRot();
 
     @Shadow
@@ -120,9 +126,6 @@ public abstract class EntityMixin {
 
     @Shadow
     public float fallDistance;
-
-    @Shadow
-    public abstract void tick();
 
     @Inject(
             method = "makeBoundingBox",
@@ -489,9 +492,7 @@ public abstract class EntityMixin {
             )
     )
     private double redirect_getHorizontalFacing_getYaw_0(double rotation) {
-        Entity this_ = (Entity) (Object) this;
-
-        Direction gravityDirection = GravityAPI.getGravityDirection(this_);
+        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
             return rotation;
         }
@@ -697,22 +698,4 @@ public abstract class EntityMixin {
         blockpos = BlockPos.containing(this.getEyePosition());
         return blockpos;
     }
-
-//    @WrapOperation(
-//            method = "canEnterPose",
-//            at = @At(
-//                    value = "INVOKE",
-//                    target = "Lnet/minecraft/world/entity/Entity;getBoundingBoxForPose(Lnet/minecraft/world/entity/Pose;)Lnet/minecraft/world/phys/AABB;"
-//            )
-//    )
-//    private AABB wrapOperation_canEnterPoseAndEntitiesWhen_getBoundingBox(
-//            Entity entity, Pose pPose, Operation<AABB> original
-//    ) {
-//        Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-//        if (gravityDirection == Direction.DOWN) {
-//            return original.call(entity, pPose);
-//        }
-//
-//        return RotationUtil.makeBoxFromDimensions(entity.getDimensions(pPose), gravityDirection, entity.getEyePosition());
-//    }
 }

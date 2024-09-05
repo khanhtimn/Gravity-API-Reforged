@@ -103,28 +103,15 @@ public abstract class PlayerMixin extends LivingEntity {
                     ordinal = 0
             )
     )
-    private ItemEntity redirect_dropItem_new_0(
-            Level world, double x, double y, double z, ItemStack stack
-    ) {
+    private ItemEntity redirect_dropItem_new_0(Level world, double x, double y, double z, ItemStack stack) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
             return new ItemEntity(world, x, y, z, stack);
         }
 
-        Vec3 vec3d = this.getEyePosition()
-                .subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.3D, 0.0D, gravityDirection));
+        Vec3 vec3d = this.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.3D, 0.0D, gravityDirection));
 
-        ItemEntity itemEntity = new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
-
-//        //TODO: change the gravity of the thrown item
-//        GravityChangerAPI.setBaseGravityDirection(
-//            itemEntity, gravityDirection
-//        );
-        // the item entity calculates position both on client and server separately
-        // if gravity is not down, the client and server will desync (the reason is not yet known)
-        // don't let item change gravity for now
-
-        return itemEntity;
+        return new ItemEntity(world, vec3d.x, vec3d.y, vec3d.z, stack);
     }
 
     @WrapOperation(

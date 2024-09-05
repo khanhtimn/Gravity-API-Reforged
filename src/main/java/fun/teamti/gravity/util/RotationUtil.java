@@ -183,8 +183,8 @@ public abstract class RotationUtil {
         double cosNegYaw = Mth.clamp(z / cosPitch, -1, 1);
         double radNegYaw = Math.acos(cosNegYaw);
         if (sinNegYaw < 0) radNegYaw = Math.PI * 2 - radNegYaw;
-        
-        return new Vec2(Mth.wrapDegrees((float) (-radNegYaw) / (float) Math.PI / 180F), (float) (radPitch) / (float) Math.PI / 180F);
+
+        return new Vec2(Mth.wrapDegrees((float) (-radNegYaw) / 0.017453292F), (float) (radPitch) / 0.017453292F);
     }
     
     public static Vec2 vecToRot(Vec3 vec3d) {

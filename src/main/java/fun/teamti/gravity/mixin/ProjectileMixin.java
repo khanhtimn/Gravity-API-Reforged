@@ -16,8 +16,9 @@ public abstract class ProjectileMixin {
             method = "shootFromRotation(Lnet/minecraft/world/entity/Entity;FFFFF)V",
             at = @At("HEAD"),
             ordinal = 0,
-            argsOnly = true)
-    private float modify_setProperties_pitch(float value, Entity user, float yaw, float roll, float speed, float divergence) {
+            argsOnly = true
+    )
+    private float modify_setProperties_pitch(float value, Entity user) {
         Direction gravityDirection = GravityAPI.getGravityDirection(user);
         if (gravityDirection == Direction.DOWN) {
             return value;
@@ -30,8 +31,9 @@ public abstract class ProjectileMixin {
             method = "shootFromRotation(Lnet/minecraft/world/entity/Entity;FFFFF)V",
             at = @At("HEAD"),
             ordinal = 1,
-            argsOnly = true)
-    private float modify_setProperties_yaw(float value, Entity user, float pitch, float roll, float speed, float divergence) {
+            argsOnly = true
+    )
+    private float modify_setProperties_yaw(float value, Entity user) {
         Direction gravityDirection = GravityAPI.getGravityDirection(user);
         if (gravityDirection == Direction.DOWN) {
             return value;
