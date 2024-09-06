@@ -66,6 +66,11 @@ public class GravityDataSyncPacket {
 
     public static void sendToClientTracking(Entity entity, CompoundTag nbtData) {
         GravityDataSyncPacket packet = new GravityDataSyncPacket(entity, nbtData);
+        ModNetwork.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), packet);
+    }
+
+    public static void sendToClientTrackingAndSelf(Entity entity, CompoundTag nbtData) {
+        GravityDataSyncPacket packet = new GravityDataSyncPacket(entity, nbtData);
         ModNetwork.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), packet);
     }
 }

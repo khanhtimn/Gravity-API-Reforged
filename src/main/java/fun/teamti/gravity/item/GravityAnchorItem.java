@@ -5,7 +5,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -36,19 +35,20 @@ public class GravityAnchorItem extends Item {
         @SubscribeEvent
         public static void onHoldingAnchorItem(LivingEvent.LivingTickEvent event) {
             Entity entity = event.getEntity();
-            if (entity instanceof Player player) {
-                player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                    for (ItemStack handSlot : player.getHandSlots()) {
-                        Item item = handSlot.getItem();
-                        if (item instanceof GravityAnchorItem anchorItem) {
-                            gravityData.applyGravityDirectionEffect(
-                                    anchorItem.gravityDirection,
-                                    null, 1000000
-                            );
+            entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                for (ItemStack handSlot : entity.getHandSlots()) {
+                    Item item = handSlot.getItem();
+                    if (item instanceof GravityAnchorItem anchorItem) {
+                        gravityData.applyGravityDirectionEffect(
+                                anchorItem.gravityDirection,
+                                null, 1000000
+                        );
+                        if (!entity.level().isClientSide()) {
+                            gravityData.setNeedsSync(true);
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 

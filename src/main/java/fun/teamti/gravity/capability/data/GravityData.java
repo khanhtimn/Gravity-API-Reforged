@@ -12,7 +12,6 @@ import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -175,7 +174,7 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             if (needsSync) {
                 needsSync = false;
                 //TODO: Sync
-                GravityDataSyncPacket.sendToClientTracking(entity, this.serializeNBT());
+                GravityDataSyncPacket.sendToClientTrackingAndSelf(entity, this.serializeNBT());
             }
         }
     }
@@ -246,8 +245,8 @@ public class GravityData implements INBTSerializable<CompoundTag> {
             return;
         }
         entity.level().players().forEach(player -> {
-            if (player instanceof ServerPlayer && player != entity) {
-                GravityDataSyncPacket.sendToClientPlayer((ServerPlayer) player, this.serializeNBT());
+            if (player != entity) {
+                GravityDataSyncPacket.sendToClientTracking(player, this.serializeNBT());
             }
         });
         //GravityChangerComponents.GRAVITY_COMP_KEY.sync(entity, this, p -> p != entity);

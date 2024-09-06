@@ -37,6 +37,8 @@ public class GravityMod
         ModItem.ITEMS.register(modEventBus);
         ModBlock.BLOCKS.register(modEventBus);
         ModBlock.BLOCK_ENTITIES.register(modEventBus);
+        ModEffect.MOB_EFFECTS.register(modEventBus);
+        ModPotion.POTIONS.register(modEventBus);
 
         //GravityDirectionMobEffect.init();
         //GravityInvertMobEffect.init();
