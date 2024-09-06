@@ -87,7 +87,7 @@ public class ModPotion {
     public static final RegistryObject<Potion> STRENGTH_REVERSE_POTION_0 = POTIONS.register("gravity_reverse_0",
             () -> new Potion(
                     new MobEffectInstance(
-                            ModEffect.STRENGTH_INCREASE.get(), 9600, 1
+                            ModEffect.STRENGTH_REVERSE.get(), 9600, 1
                     )
             )
     );
@@ -95,7 +95,7 @@ public class ModPotion {
     public static final RegistryObject<Potion> STRENGTH_REVERSE_POTION_1 = POTIONS.register("gravity_reverse_1",
             () -> new Potion(
                     new MobEffectInstance(
-                            ModEffect.STRENGTH_INCREASE.get(), 9600, 1
+                            ModEffect.STRENGTH_REVERSE.get(), 9600, 1
                     )
             )
     );

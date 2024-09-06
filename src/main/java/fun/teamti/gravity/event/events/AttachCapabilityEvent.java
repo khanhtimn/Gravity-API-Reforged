@@ -1,6 +1,7 @@
 package fun.teamti.gravity.event.events;
 
 import fun.teamti.gravity.GravityMod;
+import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.capability.data.GravityDataProvider;
 import fun.teamti.gravity.capability.dimension.DimensionGravityDataProvider;
@@ -50,33 +51,33 @@ public class AttachCapabilityEvent {
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
         Entity newEntity = event.getEntity();
         if (!(ModTag.canChangeGravity(newEntity))
-                && newEntity.level().isClientSide()
-                && ModConfig.SPAWNED_ENTITY_INHERIT_OWNER_GRAVITY.get()
+                || newEntity.level().isClientSide()
+                || !ModConfig.SPAWNED_ENTITY_INHERIT_OWNER_GRAVITY.get()
         ) {
             return;
         }
         if (newEntity instanceof TraceableEntity traceableEntity) {
             Entity owner = traceableEntity.getOwner();
             if (owner != null) {
-                owner.getCapability(ModCapability.GRAVITY_DATA).ifPresent(ownerGravityData -> {
-                    ((Entity) traceableEntity).getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                        gravityData.deserializeNBT(ownerGravityData.serializeNBT());
-                    });
-                });
+//                owner.getCapability(ModCapability.GRAVITY_DATA).ifPresent(ownerGravityData -> {
+//                    ((Entity) traceableEntity).getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+//                        gravityData.deserializeNBT(ownerGravityData.serializeNBT());
+//                    });
+//                });
             }
         }
     }
 
-    @SubscribeEvent
-    public static void onPLayerStartTracking(PlayerEvent.StartTracking event) {
-        Entity entity = event.getTarget();
-        if (!(ModTag.canChangeGravity(entity)) && entity.level().isClientSide()) {
-            return;
-        }
-        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-            GravityDataSyncPacket.sendToClientTracking(entity, gravityData.serializeNBT());
-        });
-    }
+//    @SubscribeEvent
+//    public static void onPLayerStartTracking(PlayerEvent.StartTracking event) {
+//        Entity entity = event.getTarget();
+//        if (!(ModTag.canChangeGravity(entity)) && entity.level().isClientSide()) {
+//            return;
+//        }
+//        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+//            GravityDataSyncPacket.sendToClientTracking(entity, gravityData.serializeNBT());
+//        });
+//    }
 
     @SubscribeEvent
     public static void onPlayerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
@@ -94,7 +95,7 @@ public class AttachCapabilityEvent {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        if (event.getEntity().level().isClientSide()) {
+        if (event.getEntity().level().isClientSide() || !event.isWasDeath()) {
             return;
         }
         ServerPlayer originalPlayer = (ServerPlayer) event.getOriginal();
@@ -105,7 +106,7 @@ public class AttachCapabilityEvent {
         } else {
             originalPlayer.getCapability(ModCapability.GRAVITY_DATA).ifPresent(originalGravityData -> {
                 player.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                    gravityData.setBaseGravityDirection(originalGravityData.getCurrGravityDirection());
+                    GravityDataSyncPacket.sendToClientPlayer(player, originalGravityData.serializeNBT());
                 });
             });
         }
