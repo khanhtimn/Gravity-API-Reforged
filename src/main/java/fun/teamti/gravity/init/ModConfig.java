@@ -22,51 +22,66 @@ public class ModConfig {
         BUILDER.push("Global Config");
         ROTATION_TIME = BUILDER
                 .comment("""
-                        If enabled,
+                        Camera Rotation Time
+                        The time it takes for the camera to rotate
+                        from one direction to the next
                         Default: 500""")
                 .defineInRange("rotationTime", 500, 0, 10000);
         WORLD_VELOCITY = BUILDER
                 .comment("""
-                        If enabled,
+                        World Relative Velocity Transfer
+                        Makes it so when gravity changes velocity stays world-relative
+                        lets you keep moving the same direction when gravity changes
                         Default: false""")
                 .define("worldVelocity", false);
         GRAVITY_STRENGTH_MULTIPLIER = BUILDER
                 .comment("""
+                        World Default Gravity Strength
                         Default: 1.0""")
                 .defineInRange("gravityStrengthMultiplier", 1.0, 0.0, 10.0);
         RESET_GRAVITY_ON_RESPAWN = BUILDER
                 .comment("""
-                        If enabled,
+                        Reset Gravity On Respawn
+                        Makes it so that your gravity is reset
+                        every time you respawn
                         Default: true""")
                 .define("resetGravityOnRespawn", true);
         RESET_GRAVITY_ON_CHANGED_DIMENSION = BUILDER
                 .comment("""
-                        If enabled,
+                        Reset Gravity On Changing Dimension
+                        Makes it so that your gravity is reset
+                        every time you change dimensions
                         Default: false""")
                 .define("resetGravityChangedDimension", false);
         SPAWNED_ENTITY_INHERIT_OWNER_GRAVITY = BUILDER
                 .comment("""
-                        If enabled,
+                        Inherit Owner Gravity
+                        Makes it so that entities spawned by players
+                        inherit the player's gravity
                         Default: true""")
                 .define("spawnedEntityInheritOwnerGravity", true);
         VOID_DAMAGE_ABOVE_WORLD = BUILDER
                 .comment("""
-                        If enabled,
+                        Makes it so that you start taking void damage
+                        if you are above y = max_world_height + 256
+                        and the gravity direction is up
                         Default: true""")
                 .define("voidDamageAboveWorld", true);
         VOID_DAMAGE_ON_HORIZONTAL_FALL_TOO_FAR = BUILDER
                 .comment("""
-                        If enabled,
+                        Void Damage On Falling Far for Horizontal Gravity
+                        If enabled, players will take void damage
+                        when falling too far horizontally (> 1024 blocks)
                         Default: true""")
                 .define("voidDamageOnHorizontalFallTooFar", true);
         AUTO_JUMP_ON_GRAVITY_PLATE_INNER_CORNER = BUILDER
                 .comment("""
-                        If enabled,
+                        Auto Jump On Gravity Plate Inner Corner
                         Default: true""")
                 .define("autoJumpOnGravityPlateInnerCorner", true);
         ADJUST_POSITION_AFTER_CHANGING_GRAVITY = BUILDER
                 .comment("""
-                        If enabled,
+                        Adjust Position After Changing Gravity
                         Default: true""")
                 .define("adjustPositionAfterChangingGravity", true);
         BUILDER.pop();
