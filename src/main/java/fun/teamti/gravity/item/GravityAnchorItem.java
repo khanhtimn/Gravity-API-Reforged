@@ -32,7 +32,7 @@ public class GravityAnchorItem extends Item {
     }
 
     @Mod.EventBusSubscriber
-    static class GravityAnchorChange {
+    private static class GravityAnchorChange {
         @SubscribeEvent
         public static void onHoldingAnchorItem(LivingEvent.LivingTickEvent event) {
             Entity entity = event.getEntity();
