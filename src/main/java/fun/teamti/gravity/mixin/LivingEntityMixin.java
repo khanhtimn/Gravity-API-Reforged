@@ -7,6 +7,7 @@ import fun.teamti.gravity.api.GravityAPI;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -21,11 +22,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -463,24 +462,28 @@ public abstract class LivingEntityMixin extends Entity {
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
 
-    @ModifyArgs(
+    @WrapOperation(
             method = "tickEffects",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
             )
     )
-    private void modify_tickStatusEffects_addParticle_0(Args args) {
+    private void modify_tickStatusEffects_addParticle_0(
+            Level instance, ParticleOptions pParticleData,
+            double pX, double pY, double pZ,
+            double pXSpeed, double pYSpeed, double pZSpeed,
+            Operation<Void> original
+    ) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return;
+        if (gravityDirection == Direction.DOWN)
+            original.call(instance, pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
 
-        Vec3 vec3d = this.position().subtract(RotationUtil.vecPlayerToWorld(this.position().subtract(args.get(1), args.get(2), args.get(3)), gravityDirection));
-        args.set(1, vec3d.x);
-        args.set(2, vec3d.y);
-        args.set(3, vec3d.z);
+        Vec3 vec3d = this.position().subtract(RotationUtil.vecPlayerToWorld(this.position().subtract(pX, pY, pZ), gravityDirection));
+        original.call(instance, pParticleData, vec3d.x, vec3d.y, vec3d.z, pXSpeed, pYSpeed, pZSpeed);
     }
 
-    @ModifyArgs(
+    @WrapOperation(
             method = "makePoofParticles",
             at = @At(
                     value = "INVOKE",
@@ -488,14 +491,17 @@ public abstract class LivingEntityMixin extends Entity {
                     ordinal = 0
             )
     )
-    private void modify_addDeathParticless_addParticle_0(Args args) {
+    private void modify_addDeathParticless_addParticle_0(
+            Level instance, ParticleOptions pParticleData,
+            double pX, double pY, double pZ,
+            double pXSpeed, double pYSpeed, double pZSpeed,
+            Operation<Void> original
+    ) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return;
+        if (gravityDirection == Direction.DOWN) original.call(instance, pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
 
-        Vec3 vec3d = this.position().subtract(RotationUtil.vecPlayerToWorld(this.position().subtract(args.get(1), args.get(2), args.get(3)), gravityDirection));
-        args.set(1, vec3d.x);
-        args.set(2, vec3d.y);
-        args.set(3, vec3d.z);
+        Vec3 vec3d = this.position().subtract(RotationUtil.vecPlayerToWorld(this.position().subtract(pX, pY, pZ), gravityDirection));
+        original.call(instance, pParticleData, vec3d.x, vec3d.y, vec3d.z, pXSpeed, pYSpeed, pZSpeed);
     }
 
     @ModifyVariable(
