@@ -23,9 +23,10 @@ public abstract class MobMixin {
             )
     )
     private float wrapOperation_tryAttack_getYaw_0(Mob attacker, Operation<Float> original, Entity target) {
+        var originalResult = original.call(attacker);
         Direction gravityDirection = GravityAPI.getGravityDirection(target);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(attacker);
+            return originalResult;
         }
 
         return RotationUtil.rotWorldToPlayer(original.call(attacker), attacker.getXRot(), gravityDirection).x;

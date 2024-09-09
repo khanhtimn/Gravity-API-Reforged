@@ -361,8 +361,9 @@ public abstract class EntityMixin {
             )
     )
     private AABB wrap_collide_expandTowards(AABB box, double x, double y, double z, Operation<AABB> original) {
+        var originalResult = original.call(box, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return original.call(box, x, y, z);
+        if (gravityDirection == Direction.DOWN) return originalResult;
 
         Vec3 rotate = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
         return original.call(box, rotate.x, rotate.y, rotate.z);
@@ -378,8 +379,9 @@ public abstract class EntityMixin {
             )
     )
     private AABB redirect_adjustMovementForCollisions_offset_0(AABB box, Vec3 vec3, Operation<AABB> original) {
+        var originalResult = original.call(box, vec3);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return original.call(box, vec3);
+        if (gravityDirection == Direction.DOWN) return originalResult;
 
         Vec3 rotate = RotationUtil.vecPlayerToWorld(vec3, gravityDirection);
         return original.call(box, rotate);
@@ -478,8 +480,9 @@ public abstract class EntityMixin {
             )
     )
     private AABB modify_isInsideWall_of_0(Vec3 eyePosition, double x, double y, double z, Operation<AABB> original) {
+        var originalResult = original.call(eyePosition, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return original.call(eyePosition, x, y, z);
+        if (gravityDirection == Direction.DOWN) return originalResult;
 
         Vec3 rotate = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
         return original.call(eyePosition, rotate.x, rotate.y, rotate.z);
@@ -667,8 +670,9 @@ public abstract class EntityMixin {
             )
     )
     private AABB redirect_doesNotCollide_offset_0(AABB box, double x, double y, double z, Operation<AABB> original) {
+        var originalResult = original.call(box, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) return original.call(box, x, y, z);
+        if (gravityDirection == Direction.DOWN) return originalResult;
 
         Vec3 rotate = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
         return original.call(box, rotate.x, rotate.y, rotate.z);

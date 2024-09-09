@@ -22,9 +22,10 @@ public abstract class UseOnContextMixin {
             )
     )
     private float wrapOperation_getPlayerYaw_getYaw_0(Player entity, Operation<Float> original) {
+        var originalResult = original.call(entity);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(entity), entity.getXRot(), gravityDirection).x;

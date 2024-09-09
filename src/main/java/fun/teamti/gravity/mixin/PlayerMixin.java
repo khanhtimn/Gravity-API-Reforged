@@ -55,9 +55,10 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private Vec3 wrapOperation_travel_getRotationVector_0(Player playerEntity, Operation<Vec3> original) {
+        var originalResult = original.call(playerEntity);
         Direction gravityDirection = GravityAPI.getGravityDirection(playerEntity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(playerEntity);
+            return originalResult;
         }
 
         return RotationUtil.vecWorldToPlayer(original.call(playerEntity), gravityDirection);
@@ -204,9 +205,10 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private AABB wrapOperation_method_30263_offset_0(AABB box, double x, double y, double z, Operation<AABB> original) {
+        var originalResult = original.call(box, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(box, x, y, z);
+            return originalResult;
         }
 
         Vec3 world = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
@@ -222,10 +224,11 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private float wrapOperation_attack_getYaw_0(Player attacker, Operation<Float> original, Entity target) {
+        var originalResult = original.call(attacker);
         Direction targetGravityDirection = GravityAPI.getGravityDirection(target);
         Direction attackerGravityDirection = GravityAPI.getGravityDirection(attacker);
         if (targetGravityDirection == attackerGravityDirection) {
-            return original.call(attacker);
+            return originalResult;
         }
 
         return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), attackerGravityDirection), targetGravityDirection).x;
@@ -240,10 +243,11 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private float wrapOperation_attack_getYaw_1(Player attacker, Operation<Float> original, Entity target) {
+        var originalResult = original.call(attacker);
         Direction targetGravityDirection = GravityAPI.getGravityDirection(target);
         Direction attackerGravityDirection = GravityAPI.getGravityDirection(attacker);
         if (targetGravityDirection == attackerGravityDirection) {
-            return original.call(attacker);
+            return originalResult;
         }
 
         return RotationUtil.rotWorldToPlayer(RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), attackerGravityDirection), targetGravityDirection).x;
@@ -258,9 +262,10 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private float wrapOperation_attack_getYaw_2(Player attacker, Operation<Float> original) {
+        var originalResult = original.call(attacker);
         Direction gravityDirection = GravityAPI.getGravityDirection(attacker);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(attacker);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), gravityDirection).x;
@@ -275,9 +280,10 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private float wrapOperation_attack_getYaw_3(Player attacker, Operation<Float> original) {
+        var originalResult = original.call(attacker);
         Direction gravityDirection = GravityAPI.getGravityDirection(attacker);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(attacker);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(attacker), attacker.getXRot(), gravityDirection).x;
@@ -297,7 +303,10 @@ public abstract class PlayerMixin extends LivingEntity {
             Operation<Void> original
     ) {
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) original.call(instance, pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+        if (gravityDirection == Direction.DOWN) {
+            original.call(instance, pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+            return;
+        }
 
         Vec3 vec3d = this.position().subtract(RotationUtil.vecPlayerToWorld(this.position().subtract(pX, pY, pZ), gravityDirection));
         original.call(instance, pParticleData, vec3d.x, vec3d.y, vec3d.z, pXSpeed, pYSpeed, pZSpeed);
@@ -311,9 +320,10 @@ public abstract class PlayerMixin extends LivingEntity {
             )
     )
     private AABB wrapOperation_tickMovement_expand_0(AABB box, double x, double y, double z, Operation<AABB> original) {
+        var originalResult = original.call(box, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(box, x, y, z);
+            return originalResult;
         }
 
         Vec3 vec3d = RotationUtil.maskPlayerToWorld(x, y, z, gravityDirection);

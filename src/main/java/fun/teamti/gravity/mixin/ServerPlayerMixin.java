@@ -36,7 +36,10 @@ public abstract class ServerPlayerMixin {
             @Share("pMovementZ") LocalDoubleRef argRefZ
     ) {
         Direction gravityDirection = GravityAPI.getGravityDirection(instance);
-        if (gravityDirection == Direction.DOWN) original.call(instance, pMovementY, pOnGround, blockState, blockPos);
+        if (gravityDirection == Direction.DOWN) {
+            original.call(instance, pMovementY, pOnGround, blockState, blockPos);
+            return;
+        }
 
         Vec3 localVec = RotationUtil.vecWorldToPlayer(argRefX.get(), pMovementY, argRefZ.get(), gravityDirection);
         original.call(instance, localVec.y(), pOnGround, blockState, blockPos);

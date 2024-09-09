@@ -88,11 +88,12 @@ public abstract class ClientPacketListenerMixin {
     private Vec3 wrapOperation_onExplosion_add_0(
             Vec3 vec3d, double x, double y, double z, Operation<Vec3> original
     ) {
+        var originalResult = original.call(vec3d, x, y, z);
         Direction gravityDirection = GravityAPI.getGravityDirection(
                 Minecraft.getInstance().player
         );
         if (gravityDirection == Direction.DOWN) {
-            return original.call(vec3d, x, y, z);
+            return originalResult;
         }
 
         Vec3 player = RotationUtil.vecWorldToPlayer(x, y, z, gravityDirection);

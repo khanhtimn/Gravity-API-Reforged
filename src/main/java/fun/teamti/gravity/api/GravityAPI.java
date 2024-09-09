@@ -116,7 +116,7 @@ public abstract class GravityAPI {
     }
 
     /**
-     * Sets the world relative velocity for the given player
+     * Sets the world relative velocity for the given entity
      * Using minecraft's methods to set the velocity of an entity will set player relative velocity
      */
     public static void setWorldVelocity(Entity entity, Vec3 worldVelocity) {

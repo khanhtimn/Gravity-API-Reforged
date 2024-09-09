@@ -21,9 +21,10 @@ public abstract class DirectionMixin {
             )
     )
     private static float wrapOperation_getEntityFacingOrder_getYaw_0(Entity entity, float tickDelta, Operation<Float> original) {
+        var originalResult = original.call(entity, tickDelta);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, tickDelta);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
@@ -38,9 +39,10 @@ public abstract class DirectionMixin {
             )
     )
     private static float wrapOperation_getEntityFacingOrder_getPitch_0(Entity entity, float tickDelta, Operation<Float> original) {
+        var originalResult = original.call(entity, tickDelta);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, tickDelta);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
@@ -55,9 +57,10 @@ public abstract class DirectionMixin {
             )
     )
     private static float wrapOperation_getLookDirectionForAxis_getYaw_0(Entity entity, float tickDelta, Operation<Float> original) {
+        var originalResult = original.call(entity, tickDelta);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, tickDelta);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
@@ -72,9 +75,10 @@ public abstract class DirectionMixin {
             )
     )
     private static float wrapOperation_getLookDirectionForAxis_getYaw_1(Entity entity, float tickDelta, Operation<Float> original) {
+        var originalResult = original.call(entity, tickDelta);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, tickDelta);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(original.call(entity, tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
@@ -89,9 +93,10 @@ public abstract class DirectionMixin {
             )
     )
     private static float wrapOperation_getLookDirectionForAxis_getPitch_0(Entity entity, float tickDelta, Operation<Float> original) {
+        var originalResult = original.call(entity, tickDelta);
         Direction gravityDirection = GravityAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return original.call(entity, tickDelta);
+            return originalResult;
         }
 
         return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), original.call(entity, tickDelta), gravityDirection).y;
