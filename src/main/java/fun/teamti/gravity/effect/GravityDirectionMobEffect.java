@@ -1,8 +1,8 @@
 package fun.teamti.gravity.effect;
 
 import fun.teamti.gravity.GravityMod;
-import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.init.ModCapability;
+import fun.teamti.gravity.init.ModEffect;
 import net.minecraft.core.Direction;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -15,44 +15,26 @@ import org.jetbrains.annotations.NotNull;
 
 public class GravityDirectionMobEffect extends MobEffect {
 
-    private static final int COLOR = 0x98D982;
-
     public final Direction gravityDirection;
 
-    public GravityDirectionMobEffect(Direction gravityDirection) {
-        super(MobEffectCategory.NEUTRAL, COLOR);
+    public GravityDirectionMobEffect(Direction gravityDirection, int color) {
+        super(MobEffectCategory.NEUTRAL, color);
         this.gravityDirection = gravityDirection;
     }
 
     @Override
     public void applyEffectTick(@NotNull LivingEntity pLivingEntity, int pAmplifier) {
-        pLivingEntity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData ->
-                apply(pLivingEntity, pAmplifier, gravityData)
-        );
-        super.applyEffectTick(pLivingEntity, pAmplifier);
-    }
-
-    //TODO: Would this cause problem when stacking effects?
-    //Should separate resetting of gravity direction and applying of gravity direction
-    private void apply(LivingEntity entity, int pAmplifier, GravityData gravityData) {
-        MobEffectInstance effectInstance = entity.getEffect(this);
-
-        if (effectInstance != null && effectInstance.getDuration() > 1) {
+        pLivingEntity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
             gravityData.applyGravityDirectionEffect(
                     gravityDirection,
                     null,
                     pAmplifier + 1
             );
-        } else {
-            gravityData.applyGravityDirectionEffect(
-                    gravityData.getBaseGravityDirection(),
-                    null,
-                    pAmplifier + 2
-            );
-        }
-        if (!entity.level().isClientSide()) {
-            gravityData.setNeedsSync(true);
-        }
+            if (!pLivingEntity.level().isClientSide()) {
+                gravityData.setNeedsSync(true);
+            }
+        });
+        super.applyEffectTick(pLivingEntity, pAmplifier);
     }
 
     @Override
@@ -76,6 +58,25 @@ public class GravityDirectionMobEffect extends MobEffect {
                         gravityData.setNeedsSync(true);
                     }
                 });
+            }
+        }
+
+        @SubscribeEvent
+        public static void onExpireEffect(MobEffectEvent.Expired event) {
+            for (Direction dir : Direction.values()) {
+                MobEffectInstance effectInstance = event.getEntity().getEffect(ModEffect.DIRECTION_EFFECT_MAP.get(dir));
+                if (effectInstance != null) {
+                    event.getEntity().getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
+                        gravityData.applyGravityDirectionEffect(
+                                gravityData.getBaseGravityDirection(),
+                                null,
+                                10
+                        );
+                        if (!event.getEntity().level().isClientSide()) {
+                            gravityData.setNeedsSync(true);
+                        }
+                    });
+                }
             }
         }
     }

@@ -83,7 +83,7 @@
   "gravity_api.plating.tooltip.1": "Interact with bare hand to decrease range or reverse force",
   "gravity_api.plating.tooltip.2": "Interact with Amethyst Cluster to increase range",
 
-  "itemGroup.gravity_api.general": "Gravity Changer",
+  "itemGroup.gravity_api.general": "GravityAPI",
 
   "gravity_api.preview": "You are using a development version of GravityAPI. Report issues at: ",
 

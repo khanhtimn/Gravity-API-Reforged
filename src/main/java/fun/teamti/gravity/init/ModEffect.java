@@ -21,7 +21,7 @@ public class ModEffect {
 
     static {
         for (Direction dir : Direction.values()) {
-            GravityDirectionMobEffect effect = new GravityDirectionMobEffect(dir);
+            GravityDirectionMobEffect effect = new GravityDirectionMobEffect(dir, 0x98D982);
             DIRECTION_EFFECT_MAP.put(dir, effect);
         }
     }

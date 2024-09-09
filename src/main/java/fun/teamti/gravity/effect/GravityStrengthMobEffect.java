@@ -17,8 +17,8 @@ public class GravityStrengthMobEffect extends MobEffect {
         this.signum = signum;
     }
 
-    public double getGravityStrengthMultiplier(int level) {
-        return Math.pow(base, level) * signum;
+    private double getGravityStrengthMultiplier(int amplifier) {
+        return Math.pow(base, amplifier) * signum;
     }
 
     @Override
