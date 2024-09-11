@@ -1,6 +1,7 @@
 package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
+import fun.teamti.gravity.item.CreativeTabIconItem;
 import fun.teamti.gravity.item.GravityAnchorItem;
 import fun.teamti.gravity.item.GravityChangerItem;
 import fun.teamti.gravity.item.GravityChangerItemAOE;
@@ -14,6 +15,9 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModItem {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, GravityMod.MOD_ID);
+
+    public static final RegistryObject<Item> CREATIVE_TAB_ICON = ITEMS.register("creative_tab_icon",
+            () -> new CreativeTabIconItem(new Item.Properties().stacksTo(1).durability(0)));
 
     public static final RegistryObject<Item> GRAVITY_CHANGER_DOWN = ITEMS.register("gravity_changer_down",
             () -> new GravityChangerItem(new Item.Properties().stacksTo(1), Direction.DOWN));

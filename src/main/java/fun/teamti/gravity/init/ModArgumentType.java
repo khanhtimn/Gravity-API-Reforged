@@ -1,8 +1,8 @@
 package fun.teamti.gravity.init;
 
 import fun.teamti.gravity.GravityMod;
-import fun.teamti.gravity.command.DirectionArgumentType;
-import fun.teamti.gravity.command.LocalDirectionArgumentType;
+import fun.teamti.gravity.command.argument.DirectionArgumentType;
+import fun.teamti.gravity.command.argument.LocalDirectionArgumentType;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;

@@ -1,4 +1,4 @@
-package fun.teamti.gravity.command;
+package fun.teamti.gravity.command.argument;
 
 public enum LocalDirection {
     DOWN(-1, "down"),

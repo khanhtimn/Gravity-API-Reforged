@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GravityAPI {
@@ -82,6 +83,22 @@ public abstract class GravityAPI {
      */
     public static void setBaseGravityDirection(Entity entity, Direction gravityDirection) {
         entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(data -> data.setBaseGravityDirection(gravityDirection));
+    }
+
+    /**
+     * Applies gravity direction effect for the given entity with a priority.
+     */
+    public static void applyGravityDirectionEffect(
+            Entity entity,
+            @NotNull Direction direction,
+            @Nullable RotationParameters rotationParameters,
+            double priority
+    ) {
+        entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(data -> {
+                    data.applyGravityDirectionEffect(direction, rotationParameters, priority);
+                    if (!entity.level().isClientSide()) data.setNeedsSync(true);
+                }
+        );
     }
 
     @Nullable

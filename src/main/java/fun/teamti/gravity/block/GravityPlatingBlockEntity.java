@@ -6,7 +6,6 @@ import java.util.List;
 import fun.teamti.gravity.GravityMod;
 import fun.teamti.gravity.init.*;
 import fun.teamti.gravity.api.GravityAPI;
-import fun.teamti.gravity.capability.data.GravityData;
 import fun.teamti.gravity.util.ClientUtil;
 import fun.teamti.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
@@ -257,80 +256,72 @@ public class GravityPlatingBlockEntity extends BlockEntity {
 
         for (Entity entity : entities) {
 
-//            GravityData gravityData = entity.getCapability(ModCapability.GRAVITY_DATA).orElse(new GravityData(entity));
-//            Direction entityGravityDir = gravityData.getCurrGravityDirection();
-            entity.getCapability(ModCapability.GRAVITY_DATA).ifPresent(gravityData -> {
-                boolean applies = false;
-                for (Direction plateDir : Direction.values()) {
-                    SideData sideDatum = be.sideData[plateDir.ordinal()];
-                    if (sideDatum != null) {
-                        Direction gravityEffectDir = sideDatum.isAttracting ? plateDir : plateDir.getOpposite();
-                        Direction entityGravityDir = gravityData.getCurrGravityDirection();
-                        // when the player has no gravity effect and is touching the plate with their eyes,
-                        // test the eye pos
-                        boolean isOpposite = (entityGravityDir == gravityEffectDir.getOpposite());
-                        Vec3 testingPos = isOpposite ? entity.getEyePosition() : entity.position();
+            Direction entityGravityDir = GravityAPI.getGravityDirection(entity);
+            boolean applies = false;
+            for (Direction plateDir : Direction.values()) {
+                SideData sideDatum = be.sideData[plateDir.ordinal()];
+                if (sideDatum != null) {
+                    Direction gravityEffectDir = sideDatum.isAttracting ? plateDir : plateDir.getOpposite();
+                    // when the player has no gravity effect and is touching the plate with their eyes,
+                    // test the eye pos
+                    boolean isOpposite = (entityGravityDir == gravityEffectDir.getOpposite());
+                    Vec3 testingPos = isOpposite ? entity.getEyePosition() : entity.position();
 
-                        AABB gravityEffectBox = sideDatum.getEffectBox(blockPos, plateDir, world);
-                        if (!gravityEffectBox.contains(testingPos)) {
-                            continue;
-                        }
-
-                        Vec3 plateDirVec = Vec3.atLowerCornerOf(plateDir.getNormal());
-                        Vec3 effectCenter = Vec3.atCenterOf(blockPos).add(plateDirVec.scale(0.5));
-
-                        // move the center out a little
-                        // to make the distance to sharing edge different to different plates
-                        double adjustment = 0.1;
-                        Vec3 effectCenterAdjusted = effectCenter.add(plateDirVec.scale(-adjustment));
-
-                        Vec3 deltaVec = testingPos.subtract(effectCenterAdjusted);
-
-                        double distanceToPlane = -deltaVec.dot(plateDirVec);
-                        if (distanceToPlane < -adjustment - 0.001) {
-                            continue;
-                        }
-
-                        Vec3 localVec = RotationUtil.vecWorldToPlayer(deltaVec, plateDir);
-                        double dx = RotationUtil.distanceToRange(localVec.x, -0.5, 0.5);
-                        double dz = RotationUtil.distanceToRange(localVec.z, -0.5, 0.5);
-                        double distanceToPlate = Math.sqrt(dx * dx + dz * dz + distanceToPlane * distanceToPlane);
-
-                        double priority = 1000 - distanceToPlate;
-                        if (isOpposite) {
-                            // reduce the chance of opposite side block interference
-                            priority -= 10;
-                        }
-                        gravityData.applyGravityDirectionEffect(
-                                gravityEffectDir, null, priority
-                        );
-
-                        if (!entity.level().isClientSide()) {
-                            gravityData.setNeedsSync(true);
-                        }
-
-                        applies = true;
+                    AABB gravityEffectBox = sideDatum.getEffectBox(blockPos, plateDir, world);
+                    if (!gravityEffectBox.contains(testingPos)) {
+                        continue;
                     }
-                }
 
-                if (applies && ModConfig.AUTO_JUMP_ON_GRAVITY_PLATE_INNER_CORNER.get()) {
-                    tryToDoCornerAutoJump(blockState, blockPos, entity, gravityData);
+                    Vec3 plateDirVec = Vec3.atLowerCornerOf(plateDir.getNormal());
+                    Vec3 effectCenter = Vec3.atCenterOf(blockPos).add(plateDirVec.scale(0.5));
+
+                    // move the center out a little
+                    // to make the distance to sharing edge different to different plates
+                    double adjustment = 0.1;
+                    Vec3 effectCenterAdjusted = effectCenter.add(plateDirVec.scale(-adjustment));
+
+                    Vec3 deltaVec = testingPos.subtract(effectCenterAdjusted);
+
+                    double distanceToPlane = -deltaVec.dot(plateDirVec);
+                    if (distanceToPlane < -adjustment - 0.001) {
+                        continue;
+                    }
+
+                    Vec3 localVec = RotationUtil.vecWorldToPlayer(deltaVec, plateDir);
+                    double dx = RotationUtil.distanceToRange(localVec.x, -0.5, 0.5);
+                    double dz = RotationUtil.distanceToRange(localVec.z, -0.5, 0.5);
+                    double distanceToPlate = Math.sqrt(dx * dx + dz * dz + distanceToPlane * distanceToPlane);
+
+                    double priority = 1000 - distanceToPlate;
+                    if (isOpposite) {
+                        // reduce the chance of opposite side block interference
+                        priority -= 10;
+                    }
+                    GravityAPI.applyGravityDirectionEffect(
+                            entity, gravityEffectDir, null, priority
+                    );
+
+                    applies = true;
                 }
-            });
+            }
+
+            if (applies && ModConfig.AUTO_JUMP_ON_GRAVITY_PLATE_INNER_CORNER.get()) {
+                tryToDoCornerAutoJump(blockState, blockPos, entity);
+            }
         }
     }
 
     // when approaching an inward corner, do auto-jump to make it smoothly go forward
     private static void tryToDoCornerAutoJump(
             BlockState blockState, BlockPos blockPos,
-            Entity entity, GravityData comp
+            Entity entity
     ) {
         if (!entity.onGround()) {
             return;
         }
 
         // apply levitation when the entity is close to corner
-        Direction entityGravityDir = comp.getCurrGravityDirection();
+        Direction entityGravityDir = GravityAPI.getGravityDirection(entity);
 
         for (Direction plateDir : Direction.values()) {
             if (GravityPlatingBlock.hasDir(blockState, plateDir)) {
@@ -355,7 +346,7 @@ public class GravityPlatingBlockEntity extends BlockEntity {
 
                 double distanceToPlate = Math.abs(entity.position().subtract(effectCenter).dot(plateDirVec));
                 if (distanceToPlate < 0.8) {
-                    double strengthSqrt = Math.sqrt(comp.getCurrGravityStrength());
+                    double strengthSqrt = Math.sqrt(GravityAPI.getGravityStrength(entity));
 
                     Vec3 entityGravityVec = Vec3.atLowerCornerOf(entityGravityDir.getNormal());
 

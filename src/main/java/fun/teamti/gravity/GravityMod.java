@@ -15,20 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Mod(GravityMod.MOD_ID)
-public class GravityMod
-{
+public class GravityMod {
     public static final String MOD_ID = "gravity_api";
     public static final Logger LOGGER = LoggerFactory.getLogger("GravityAPI");
     public static final String ISSUE_LINK = "https://github.com/khanhtimn/Gravity-API-Reforged/issues";
     public static boolean displayPreviewWarning = true;
 
-    public GravityMod()
-    {
+    public GravityMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.SPEC, "gravity_api.toml");
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
+
 
         MinecraftForge.EVENT_BUS.addListener(ClientUtil::showWarningOnJoin);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> GravityCommand.register(event.getDispatcher()));
@@ -39,21 +38,18 @@ public class GravityMod
         ModBlock.BLOCK_ENTITIES.register(modEventBus);
         ModEffect.MOB_EFFECTS.register(modEventBus);
         ModPotion.POTIONS.register(modEventBus);
-
-        //GravityDirectionMobEffect.init();
-        //GravityInvertMobEffect.init();
-        //GravityStrengthMobEffect.init();
-        //GravityPotion.init();
+        ModItemGroup.CREATIVE_TAB.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    private void commonSetup(final FMLCommonSetupEvent event) {
         ModNetwork.init();
     }
 
-    private void clientSetup (final FMLClientSetupEvent event) {
+    private void clientSetup(final FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+        });
     }
 
 }

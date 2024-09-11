@@ -1,4 +1,4 @@
-package fun.teamti.gravity.command;
+package fun.teamti.gravity.command.argument;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
